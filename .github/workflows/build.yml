@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
+        arch: [amd64, arm]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -23,11 +24,13 @@ jobs:
         
       - name: Build
         run: go build
+        env:
+          GOARCH: ${{ matrix.arch }}
       
       - name: Create package
         uses: actions/upload-artifact@v2
         with:
-          name: XOutput
+          name: icon-metrics
           path: |
             icon-metrics
             icon-metrics.exe
