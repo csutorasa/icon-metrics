@@ -12,7 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        arch: [amd64, arm64]
+        arch: [amd64]
+        include:
+          - os: macos-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: arm64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
