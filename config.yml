@@ -1,0 +1,9 @@
+port: 8080 # http server port to host metrics on
+devices:
+  #- url: http://192.168.1.10 # device address
+  #  sysid: '123123123123' # device ID (printed on the controller)
+  #  password: '123123123123' # password (same as sysid if empty)
+  #  delay: 60 # delay in seconds between reads
+  
+  #- url: http://192.168.1.11 # device address
+  #  sysid: '321321321321' # device ID (printed on the controller)
