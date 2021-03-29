@@ -52,3 +52,4 @@ Available metrics:
 
 ## Grafana dashboard
 
+![grafana_image](https://user-images.githubusercontent.com/6968192/112884441-ce609c00-90cf-11eb-86e5-9dce7dab8e2a.png)
