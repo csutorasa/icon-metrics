@@ -44,7 +44,11 @@ func (this *simpleSession) Report(values *DataPollResponse) {
 		metrics.RoomTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.Temperature)
 		metrics.RelayGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(float64(thermostat.Relay))
 		metrics.HumidityGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.RelativeHumidity)
-		metrics.TargetTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.HeatingTargetTemperature)
+		if values.Heating == 1 {
+			metrics.TargetTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.HeatingTargetTemperature)
+		} else {
+			metrics.TargetTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.CoolingTargetTemperature)
+		}
 	}
 }
 
