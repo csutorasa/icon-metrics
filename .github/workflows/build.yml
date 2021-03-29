@@ -29,8 +29,8 @@ jobs:
         with:
           name: XOutput
           path: |
-          icon-metrics
-          icon-metrics.exe
-          config.yml
+            icon-metrics
+            icon-metrics.exe
+            config.yml
 
       
