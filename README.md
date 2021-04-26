@@ -38,6 +38,7 @@ Restart=always
 ```
 
 ```bash
+systemctl daemon-reload
 systemctl enable icon-metrics.service
 systemctl start icon-metrics.service
 ```
