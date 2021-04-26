@@ -1,4 +1,4 @@
-# Icon-metrics
+# iCON-metrics
 
 This is an command line application which reads data from [NGBS iCON smart home control systems](https://www.ngbsh.hu/en/icon.html).
 
@@ -15,6 +15,31 @@ devices:
     delay: 60 # delay in seconds between reads (default 60)
   - url: http://192.168.1.11 # device address
     sysid: '321321321321' # device ID (printed on the controller)
+```
+
+## Systemd config
+
+```bash
+touch /etc/systemd/system/icon-metrics.service
+```
+
+```ini
+[Unit]
+Description=iCON metrics publisher
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/path/to/icon-metrics
+WorkingDirectory=/path/to
+Restart=always
+```
+
+```bash
+systemctl enable icon-metrics.service
+systemctl start icon-metrics.service
 ```
 
 ## Metrics
