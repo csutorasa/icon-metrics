@@ -121,6 +121,7 @@ func (this *httpIconClient) ReadValues() (*DataPollResponse, error) {
 	res, err := this.client.Do(req)
 	if err != nil {
 		metrics.HttpGauge.WithLabelValues(this.sysId, "read_values", "0").Observe(timer.End().Seconds())
+		this.removeSession()
 		return nil, err
 	}
 	defer res.Body.Close()
