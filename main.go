@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/csutorasa/icon-metrics/client"
-	"github.com/csutorasa/icon-metrics/config"
 	"github.com/csutorasa/icon-metrics/metrics"
 	"github.com/csutorasa/icon-metrics/publisher"
 )
@@ -88,9 +87,9 @@ func parseArgs() string {
 	return *configPath
 }
 
-func readConfig(configPath string) (*config.Configuration, error) {
+func readConfig(configPath string) (*Configuration, error) {
 	logger.Printf("Loading configuration from %s", configPath)
-	c, err := config.ReadConfig(configPath)
+	c, err := ReadConfig(configPath)
 	if err != nil {
 		return nil, err
 	}

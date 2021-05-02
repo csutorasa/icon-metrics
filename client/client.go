@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/csutorasa/icon-metrics/config"
 	"github.com/csutorasa/icon-metrics/metrics"
 )
 
@@ -45,21 +44,6 @@ func NewIconClient(urlStr string, sysId string, password string) (IconClient, er
 		url:       u,
 		sysId:     sysId,
 		password:  password,
-		sessionId: "",
-	}, nil
-}
-
-func NewIconClientFromConfig(config *config.IconConfiguration) (IconClient, error) {
-	u, err := url.Parse(config.Url)
-	if err != nil {
-		return nil, err
-	}
-	metrics.ConntectedGauge.WithLabelValues(config.SysId).Set(0)
-	return &httpIconClient{
-		client:    &http.Client{},
-		url:       u,
-		sysId:     config.SysId,
-		password:  config.Password,
 		sessionId: "",
 	}, nil
 }

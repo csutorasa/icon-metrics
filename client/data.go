@@ -1,16 +1,29 @@
 package client
 
+type HC int
+type CE int
+
+const (
+	Heating HC = 0
+	Cooling HC = 1
+)
+
+const (
+	Comfort CE = 0
+	Eco     CE = 1
+)
+
 type DataPollResponse struct {
 	SysId                       string         `json:"SYSID"`
 	SERVICE                     int            `json:"SERVICE"`
 	Version                     string         `json:"VER"`
-	Heating                     int            `json:"HC"`
-	CE                          int            `json:"CE"`
+	HeatingCooling              HC             `json:"HC"`
+	ComfortEco                  CE             `json:"CE"`
 	ON                          int            `json:"ON"`
-	ETEMP                       float64        `json:"ETEMP"`
+	ExternalTemperature         float64        `json:"ETEMP"`
 	WaterTemperature            float64        `json:"WTEMP"`
 	Pump                        int            `json:"PUMP"`
-	ERR                         int            `json:"ERR"`
+	Error                       int            `json:"ERR"`
 	OverheatWarning             int            `json:"OVERHEAT"`
 	FrostWarning                int            `json:"WFROST"`
 	HeatingTargetTemperature    float64        `json:"XAH"`
@@ -25,6 +38,22 @@ type DataPollResponse struct {
 	TPR                         TPR            `json:"TPR"`
 }
 
+func (this *DataPollResponse) TargetTemperature() float64 {
+	if this.HeatingCooling == Heating {
+		if this.ComfortEco == Comfort {
+			return this.HeatingTargetTemperature
+		} else {
+			return this.EcoHeatingTargetTemperature
+		}
+	} else {
+		if this.ComfortEco == Comfort {
+			return this.CoolingTargetTemperature
+		} else {
+			return this.EcoCoolingTargetTemperature
+		}
+	}
+}
+
 type DP struct {
 	Enabled                     int     `json:"ON"`
 	IHC                         int     `json:"IHC"`
@@ -35,9 +64,9 @@ type DP struct {
 	ManualRange                 float64 `json:"LIM"`
 	DWP                         int     `json:"DWP"`
 	FrostWarning                int     `json:"FROST"`
-	CE                          int     `json:"CE"`
-	HC                          int     `json:"HC"`
-	DI                          int     `json:"DI"`
+	ComfortEco                  CE      `json:"CE"`
+	HeatingCooling              HC      `json:"HC"`
+	OpenWindowInput             int     `json:"DI"`
 	HeatingTargetTemperature    float64 `json:"XAH"`
 	CoolingTargetTemperature    float64 `json:"XAC"`
 	EcoHeatingTargetTemperature float64 `json:"ECOH"`
@@ -52,6 +81,22 @@ type DP struct {
 	MV                          int     `json:"MV"`
 	TPR                         int     `json:"TPR"`
 	Name                        string  `json:"NAME"`
+}
+
+func (this *DP) TargetTemperature() float64 {
+	if this.HeatingCooling == Heating {
+		if this.ComfortEco == Comfort {
+			return this.HeatingTargetTemperature
+		} else {
+			return this.EcoHeatingTargetTemperature
+		}
+	} else {
+		if this.ComfortEco == Comfort {
+			return this.CoolingTargetTemperature
+		} else {
+			return this.EcoCoolingTargetTemperature
+		}
+	}
 }
 
 type TPR struct {

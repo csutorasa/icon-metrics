@@ -70,11 +70,13 @@ Available metrics:
 | uptime                    | gauge   | uptime in milliseconds                              |
 | icon_controller_connected | gauge   | 1 if the controller is ready to be read 0 otherwise |
 | icon_http_client_seconds  | summary | icon HTTP request durations in seconds              |
+| icon_external_temperature | gauge   | external temperature                                |
 | icon_water_temperature    | gauge   | water temperature                                   |
 | icon_temperature          | gauge   | room temperature                                    |
 | icon_relay_on             | gauge   | 1 if room relay is open 0 otherwise                 |
 | icon_humidity             | gauge   | room humidity                                       |
 | icon_target_temperature   | gauge   | room target temperature                             |
+| icon_dew_temperature      | gauge   | room dew temperature                                |
 
 ## Grafana dashboard
 

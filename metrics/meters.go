@@ -34,8 +34,16 @@ var WaterTemperatureGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 	Name: "icon_water_temperature",
 	Help: "Water temperature",
 }, genericParameters)
+var ExternalTemperatureGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	Name: "icon_external_temperature",
+	Help: "External temperature",
+}, genericParameters)
 var RoomTemperatureGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 	Name: "icon_temperature",
+	Help: "Room temperature",
+}, roomParameters)
+var RoomDewTemperatureGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	Name: "icon_dew_temperature",
 	Help: "Room temperature",
 }, roomParameters)
 var RelayGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{

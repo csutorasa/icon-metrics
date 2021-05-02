@@ -36,19 +36,17 @@ func (this *simpleSession) Report(values *DataPollResponse) {
 		}
 	}
 
+	metrics.ExternalTemperatureGauge.WithLabelValues(this.sysId).Set(values.ExternalTemperature)
 	metrics.WaterTemperatureGauge.WithLabelValues(this.sysId).Set(values.WaterTemperature)
 	for id, thermostat := range values.Thermostats {
 		if thermostat.Enabled == 0 {
 			continue
 		}
 		metrics.RoomTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.Temperature)
+		metrics.RoomDewTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.DewTemperature)
 		metrics.RelayGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(float64(thermostat.Relay))
 		metrics.HumidityGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.RelativeHumidity)
-		if values.Heating == 1 {
-			metrics.TargetTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.HeatingTargetTemperature)
-		} else {
-			metrics.TargetTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.CoolingTargetTemperature)
-		}
+		metrics.TargetTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.TargetTemperature())
 	}
 }
 
