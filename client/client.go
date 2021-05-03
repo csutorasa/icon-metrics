@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -14,16 +13,7 @@ import (
 	"github.com/csutorasa/icon-metrics/metrics"
 )
 
-type IconClient interface {
-	io.Closer
-	Login() error
-	ReadValues() (*DataPollResponse, error)
-	Logout() error
-	IsLoggedIn() bool
-	SysId() string
-}
-
-type httpIconClient struct {
+type IconClient struct {
 	client    *http.Client
 	url       *url.URL
 	sysId     string
@@ -33,13 +23,13 @@ type httpIconClient struct {
 
 const phpSessionId = "PHPSESSID"
 
-func NewIconClient(urlStr string, sysId string, password string) (IconClient, error) {
+func NewIconClient(urlStr string, sysId string, password string) (*IconClient, error) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 	metrics.ConntectedGauge.WithLabelValues(sysId).Set(0)
-	return &httpIconClient{
+	return &IconClient{
 		client:    &http.Client{},
 		url:       u,
 		sysId:     sysId,
@@ -48,7 +38,7 @@ func NewIconClient(urlStr string, sysId string, password string) (IconClient, er
 	}, nil
 }
 
-func (this *httpIconClient) Login() error {
+func (this *IconClient) Login() error {
 	timer := metrics.NewTimer()
 	formData := url.Values{
 		"sysid":    []string{this.sysId},
@@ -90,7 +80,7 @@ func (this *httpIconClient) Login() error {
 	return nil
 }
 
-func (this *httpIconClient) ReadValues() (*DataPollResponse, error) {
+func (this *IconClient) ReadValues() (*DataPollResponse, error) {
 	timer := metrics.NewTimer()
 	fomrData := url.Values{
 		"tab": []string{"datapoll"},
@@ -124,7 +114,7 @@ func (this *httpIconClient) ReadValues() (*DataPollResponse, error) {
 	return data, nil
 }
 
-func (this *httpIconClient) Logout() error {
+func (this *IconClient) Logout() error {
 	timer := metrics.NewTimer()
 	fomrData := url.Values{
 		"logout": []string{"true"},
@@ -150,21 +140,21 @@ func (this *httpIconClient) Logout() error {
 	return nil
 }
 
-func (this *httpIconClient) IsLoggedIn() bool {
+func (this *IconClient) IsLoggedIn() bool {
 	return this.sessionId != ""
 }
 
-func (this *httpIconClient) SysId() string {
+func (this *IconClient) SysId() string {
 	return this.sysId
 }
 
-func (this *httpIconClient) Close() error {
+func (this *IconClient) Close() error {
 	err := this.Logout()
 	metrics.ConntectedGauge.DeleteLabelValues(this.sysId)
 	return err
 }
 
-func (this *httpIconClient) getPath(p string) *url.URL {
+func (this *IconClient) getPath(p string) *url.URL {
 	u, err := url.Parse(this.url.String())
 	if err != nil {
 
@@ -173,7 +163,7 @@ func (this *httpIconClient) getPath(p string) *url.URL {
 	return u
 }
 
-func (this *httpIconClient) removeSession() {
+func (this *IconClient) removeSession() {
 	metrics.ConntectedGauge.WithLabelValues(this.sysId).Set(0)
 	this.sessionId = ""
 }
@@ -199,7 +189,7 @@ func getBodyBytes(res *http.Response) ([]byte, error) {
 	return body[0:read], nil
 }
 
-func (client *httpIconClient) updateCookie(cookies []*http.Cookie) bool {
+func (client *IconClient) updateCookie(cookies []*http.Cookie) bool {
 	for _, cookie := range cookies {
 		if cookie.Name == phpSessionId {
 			client.sessionId = cookie.Value

@@ -2,20 +2,16 @@ package metrics
 
 import "time"
 
-type Timer interface {
-	End() time.Duration
-}
-
-type timeMeter struct {
+type Timer struct {
 	startTime time.Time
 }
 
-func NewTimer() Timer {
-	return &timeMeter{
+func NewTimer() *Timer {
+	return &Timer{
 		startTime: time.Now(),
 	}
 }
 
-func (this *timeMeter) End() time.Duration {
+func (this *Timer) End() time.Duration {
 	return time.Since(this.startTime)
 }

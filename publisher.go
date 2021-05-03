@@ -1,4 +1,4 @@
-package publisher
+package main
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type prometheusPublisher struct {
-	server   *http.Server
+type Publisher struct {
+	server *http.Server
 }
 
-func NewPrometherusPublisher(port int) Publisher {
-	publisher := &prometheusPublisher{}
+func NewPrometherusPublisher(port int) *Publisher {
+	publisher := &Publisher{}
 	publisher.server = &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
 		Handler:        publisher,
@@ -26,7 +26,7 @@ func NewPrometherusPublisher(port int) Publisher {
 	return publisher
 }
 
-func (this *prometheusPublisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (this *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/metrics" {
 		promhttp.Handler().ServeHTTP(w, r)
 	} else {
@@ -34,7 +34,7 @@ func (this *prometheusPublisher) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (this *prometheusPublisher) Start() error {
+func (this *Publisher) Start() error {
 	ln, err := net.Listen("tcp", this.server.Addr)
 	if err != nil {
 		return err
@@ -45,10 +45,10 @@ func (this *prometheusPublisher) Start() error {
 	return nil
 }
 
-func (this *prometheusPublisher) Stop(context context.Context) error {
+func (this *Publisher) Stop(context context.Context) error {
 	return this.server.Shutdown(context)
 }
 
-func (this *prometheusPublisher) Close() error {
+func (this *Publisher) Close() error {
 	return this.server.Close()
 }

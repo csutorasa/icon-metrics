@@ -4,29 +4,24 @@ import (
 	"github.com/csutorasa/icon-metrics/metrics"
 )
 
-type MetricsSession interface {
-	Report(values *DataPollResponse)
-	Reset()
-}
-
 type roomDescriptor struct {
 	Id   string
 	Name string
 }
 
-type simpleSession struct {
+type MetricsSession struct {
 	sysId           string
 	roomDescriptors []roomDescriptor
 }
 
-func NewSession(sysId string) MetricsSession {
-	return &simpleSession{
+func NewSession(sysId string) *MetricsSession {
+	return &MetricsSession{
 		sysId:           sysId,
 		roomDescriptors: make([]roomDescriptor, 0),
 	}
 }
 
-func (this *simpleSession) Report(values *DataPollResponse) {
+func (this *MetricsSession) Report(values *DataPollResponse) {
 	if len(this.roomDescriptors) == 0 {
 		for id, thermostat := range values.Thermostats {
 			if thermostat.Enabled == 0 {
@@ -50,10 +45,12 @@ func (this *simpleSession) Report(values *DataPollResponse) {
 	}
 }
 
-func (this *simpleSession) Reset() {
+func (this *MetricsSession) Reset() {
 	metrics.WaterTemperatureGauge.DeleteLabelValues(this.sysId)
+	metrics.ExternalTemperatureGauge.DeleteLabelValues(this.sysId)
 	for _, roomDescriptor := range this.roomDescriptors {
 		metrics.RoomTemperatureGauge.DeleteLabelValues(this.sysId, roomDescriptor.Id, roomDescriptor.Name)
+		metrics.RoomDewTemperatureGauge.DeleteLabelValues(this.sysId, roomDescriptor.Id, roomDescriptor.Name)
 		metrics.RelayGauge.DeleteLabelValues(this.sysId, roomDescriptor.Id, roomDescriptor.Name)
 		metrics.HumidityGauge.DeleteLabelValues(this.sysId, roomDescriptor.Id, roomDescriptor.Name)
 		metrics.TargetTemperatureGauge.DeleteLabelValues(this.sysId, roomDescriptor.Id, roomDescriptor.Name)

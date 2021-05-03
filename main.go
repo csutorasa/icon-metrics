@@ -12,7 +12,6 @@ import (
 
 	"github.com/csutorasa/icon-metrics/client"
 	"github.com/csutorasa/icon-metrics/metrics"
-	"github.com/csutorasa/icon-metrics/publisher"
 )
 
 var logger *log.Logger = log.Default()
@@ -30,7 +29,7 @@ func main() {
 
 	logger.Printf("Starting prometheus server on port %d", c.Port)
 	start := metrics.NewTimer()
-	p := publisher.NewPrometherusPublisher(c.Port)
+	p := NewPrometherusPublisher(c.Port)
 
 	err = p.Start()
 	if err != nil {
@@ -131,7 +130,7 @@ func interruptHandler(channels []chan int) {
 	}()
 }
 
-func reportValues(c client.IconClient, trigger chan int, d time.Duration) {
+func reportValues(c *client.IconClient, trigger chan int, d time.Duration) {
 	session := client.NewSession(c.SysId())
 	for {
 		if !c.IsLoggedIn() {
