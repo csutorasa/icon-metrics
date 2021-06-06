@@ -1,5 +1,11 @@
 package client
 
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
 type HC int
 type CE int
 
@@ -71,7 +77,7 @@ type DP struct {
 	CoolingTargetTemperature    float64 `json:"XAC"`
 	EcoHeatingTargetTemperature float64 `json:"ECOH"`
 	EcoCoolingTargetTemperature float64 `json:"ECOC"`
-	PL                          int     `json:"PL"`
+	ParentalLock                int     `json:"PL"`
 	CEF                         int     `json:"CEF"`
 	CEC                         int     `json:"CEC"`
 	RegBHeating                 int     `json:"DXH"`
@@ -111,6 +117,21 @@ const success = "success"
 const failure = "failure"
 
 type actionResponse struct {
-	Result  string `json:"result"`
-	Refresh bool   `json:"refresh"`
+	Result  string                 `json:"result"`
+	Refresh bool                   `json:"refresh"`
+	Errors  map[string]interface{} `json:"errors"`
+}
+
+func (this *actionResponse) IsSuccess() bool {
+	return this.Result == "success"
+}
+
+func (this *actionResponse) CreateError() error {
+	var sb strings.Builder
+	for error, data := range this.Errors {
+		sb.WriteString(error)
+		sb.WriteString(" ")
+		sb.WriteString(fmt.Sprintf("%v", data))
+	}
+	return errors.New(sb.String())
 }

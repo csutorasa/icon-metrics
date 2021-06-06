@@ -66,15 +66,15 @@ func (this *IconClient) Login() error {
 	if !this.updateCookie(res.Cookies()) {
 		return errors.New("No session was found")
 	}
-	actionResponse := actionResponse{}
-	err = unmarshalBody(res, &actionResponse)
+	data := actionResponse{}
+	err = unmarshalBody(res, &data)
 	if err != nil {
 		this.removeSession()
 		return err
 	}
-	if actionResponse.Result != "success" {
+	if !data.IsSuccess() {
 		this.removeSession()
-		return errors.New("Failed to login")
+		return data.CreateError()
 	}
 	metrics.ConntectedGauge.WithLabelValues(this.sysId).Set(1)
 	return nil
@@ -112,6 +112,76 @@ func (this *IconClient) ReadValues() (*DataPollResponse, error) {
 		return data, err
 	}
 	return data, nil
+}
+
+func (this *IconClient) SetThermostatSettings(tab int, thermosSettings ThermostatSettings) error {
+	timer := metrics.NewTimer()
+	fomrData := getValues(thermosSettings.ToValues(tab))
+	req, err := http.NewRequest("POST", this.getPath("index.php").String(), strings.NewReader(fomrData.Encode()))
+	if err != nil {
+		metrics.HttpGauge.WithLabelValues(this.sysId, "set_thermostat_settings", "0").Observe(timer.End().Seconds())
+		return err
+	}
+	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: this.sessionId})
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	res, err := this.client.Do(req)
+	if err != nil {
+		metrics.HttpGauge.WithLabelValues(this.sysId, "set_thermostat_settings", "0").Observe(timer.End().Seconds())
+		this.removeSession()
+		return err
+	}
+	defer res.Body.Close()
+	metrics.HttpGauge.WithLabelValues(this.sysId, "set_thermostat_settings", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
+	if res.StatusCode != 200 {
+		this.removeSession()
+		return errors.New(fmt.Sprintf("Failed to read data, status code %d", res.StatusCode))
+	}
+	this.updateCookie(res.Cookies())
+	data := &actionResponse{}
+	err = unmarshalBody(res, &data)
+	if err != nil {
+		this.removeSession()
+		return err
+	}
+	if !data.IsSuccess() {
+		return data.CreateError()
+	}
+	return nil
+}
+
+func (this *IconClient) SetGeneralSettings(tab int, generalSettings *GeneralSettings) error {
+	timer := metrics.NewTimer()
+	fomrData := getValues(generalSettings.ToValues(tab))
+	req, err := http.NewRequest("POST", this.getPath("index.php").String(), strings.NewReader(fomrData.Encode()))
+	if err != nil {
+		metrics.HttpGauge.WithLabelValues(this.sysId, "set_general_settings", "0").Observe(timer.End().Seconds())
+		return err
+	}
+	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: this.sessionId})
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	res, err := this.client.Do(req)
+	if err != nil {
+		metrics.HttpGauge.WithLabelValues(this.sysId, "set_general_settings", "0").Observe(timer.End().Seconds())
+		this.removeSession()
+		return err
+	}
+	defer res.Body.Close()
+	metrics.HttpGauge.WithLabelValues(this.sysId, "set_general_settings", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
+	if res.StatusCode != 200 {
+		this.removeSession()
+		return errors.New(fmt.Sprintf("Failed to read data, status code %d", res.StatusCode))
+	}
+	this.updateCookie(res.Cookies())
+	data := &actionResponse{}
+	err = unmarshalBody(res, &data)
+	if err != nil {
+		this.removeSession()
+		return err
+	}
+	if !data.IsSuccess() {
+		return data.CreateError()
+	}
+	return nil
 }
 
 func (this *IconClient) Logout() error {
@@ -197,4 +267,21 @@ func (client *IconClient) updateCookie(cookies []*http.Cookie) bool {
 		}
 	}
 	return false
+}
+
+func getValues(parameters map[string][]string) url.Values {
+	query := url.Values{}
+	for key, values := range parameters {
+		if len(values) == 0 {
+			continue
+		}
+		if len(values) == 1 {
+			query.Set(key, values[0])
+		} else {
+			for _, value := range values {
+				query.Add(key, value)
+			}
+		}
+	}
+	return query
 }
