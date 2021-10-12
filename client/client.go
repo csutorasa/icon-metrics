@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/csutorasa/icon-metrics/metrics"
 )
@@ -30,7 +32,14 @@ func NewIconClient(urlStr string, sysId string, password string) (*IconClient, e
 	}
 	metrics.ConntectedGauge.WithLabelValues(sysId).Set(0)
 	return &IconClient{
-		client:    &http.Client{},
+		client: &http.Client{
+			Transport: &http.Transport{
+				Dial: (&net.Dialer{
+					Timeout: 1 * time.Second,
+				}).Dial,
+			},
+			Timeout: 10 * time.Second,
+		},
 		url:       u,
 		sysId:     sysId,
 		password:  password,
