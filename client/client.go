@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -248,7 +249,7 @@ func (this *IconClient) removeSession() {
 }
 
 func unmarshalBody(res *http.Response, v interface{}) error {
-	body, err := getBodyBytes(res)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
@@ -257,15 +258,6 @@ func unmarshalBody(res *http.Response, v interface{}) error {
 		return err
 	}
 	return nil
-}
-
-func getBodyBytes(res *http.Response) ([]byte, error) {
-	body := make([]byte, 8092)
-	read, err := res.Body.Read(body)
-	if err.Error() != "EOF" {
-		return nil, err
-	}
-	return body[0:read], nil
 }
 
 func (client *IconClient) updateCookie(cookies []*http.Cookie) bool {
