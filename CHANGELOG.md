@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Stripping executables, removes all debug information to reduce executable size.
+
 ## 1.1.0
 
 Bump go version to 1.18
