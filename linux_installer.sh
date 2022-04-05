@@ -4,8 +4,8 @@ ICON_METRICS_VERSION="1.1.0"
 ICON_METRICS_ARCH=${1:-amd64}
 
 INSTALL_TMP_DIR=~/.icon-metrics-install
-DOWNLOAD_FILENAME=icon-metrics-linux-$ICON_METRICS_ARCH.zip
-DOWNLOAD_URL="https://github.com/csutorasa/icon-metrics/releases/download/$ICON_METRICS_VERSION/$DOWNLOAD_FILENAME"
+DOWNLOAD_FILENAME=icon-metrics-linux-$ICON_METRICS_ARCH
+DOWNLOAD_URL="https://github.com/csutorasa/icon-metrics/releases/download/$ICON_METRICS_VERSION/$DOWNLOAD_FILENAME.zip"
 
 if [[ -d "$INSTALL_TMP_DIR" ]] ; then
     echo "Temp directory $INSTALL_TMP_DIR exists!"
@@ -18,7 +18,7 @@ fi
 
 if which curl >/dev/null ; then
     mkdir -p $INSTALL_TMP_DIR
-    curl $DOWNLOAD_URL --output "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME"
+    curl $DOWNLOAD_URL --output "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME.zip"
 elif which wget >/dev/null ; then
     mkdir -p $INSTALL_TMP_DIR
     wget $DOWNLOAD_URL -P "$INSTALL_TMP_DIR"
