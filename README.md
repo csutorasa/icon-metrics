@@ -46,35 +46,10 @@ WorkingDirectory=/path/to
 Restart=always
 ```
 
-Automatic install script
+[Automatic install script](linux_installer.sh)
 
 ```bash
-INSTALL_TMP_DIR=~/.icon-metrics-install
-mkdir -p $INSTALL_TMP_DIR
-wget -q https://github.com/csutorasa/icon-metrics/releases/download/1.0.0/icon-metrics-linux-amd64.zip -P $INSTALL_TMP_DIR
-unzip -q $INSTALL_TMP_DIR/icon-metrics-*.zip -d $INSTALL_TMP_DIR
-mkdir -p /usr/local/bin/
-mv $INSTALL_TMP_DIR/icon-metrics /usr/local/bin/
-chmod +x /usr/local/bin/icon-metrics
-mkdir -p /etc/icon-metrics
-mv $INSTALL_TMP_DIR/config.yml /etc/icon-metrics/
-rm -rf $INSTALL_TMP_DIR
-cat > /etc/systemd/system/icon-metrics.service << EOF
-[Unit]
-Description=iCON metrics publisher
-
-[Install]
-WantedBy=multi-user.target
-
-[Service]
-Type=simple
-ExecStart=/usr/local/bin/icon-metrics --config /etc/icon-metrics/config.yml
-WorkingDirectory=/usr/local/bin/
-Restart=always
-EOF
-systemctl daemon-reload
-systemctl enable icon-metrics.service
-systemctl start icon-metrics.service
+curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | bash -s amd64
 ```
 
 ## Metrics
