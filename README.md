@@ -43,13 +43,15 @@ WantedBy=multi-user.target
 Type=simple
 ExecStart=/path/to/icon-metrics
 WorkingDirectory=/path/to
+StandardOutput=/var/log/icon-metrics/log.log
+StandardError=/var/log/icon-metrics/error.log
 Restart=always
 ```
 
 [Automatic install script](linux_installer.sh)
 
 ```bash
-curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | bash -s amd64
+sudo curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | bash -s amd64
 ```
 
 ## Metrics
