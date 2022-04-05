@@ -11,14 +11,10 @@ if [[ -d "$INSTALL_TMP_DIR" ]] ; then
     echo "Temp directory $INSTALL_TMP_DIR exists!"
     exit 1
 fi
-if ! which unzip >/dev/null ; then 
-    echo "unzip command is available!"
-    exit 1
-fi
 
 if which curl >/dev/null ; then
     mkdir -p $INSTALL_TMP_DIR
-    curl $DOWNLOAD_URL --output "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME.zip"
+    curl -L $DOWNLOAD_URL --output "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME.zip"
 elif which wget >/dev/null ; then
     mkdir -p $INSTALL_TMP_DIR
     wget $DOWNLOAD_URL -P "$INSTALL_TMP_DIR"
@@ -30,8 +26,17 @@ if [ $? -ne 0 ] ; then
     echo "Failed to download file!"
     exit 1
 fi
-unzip "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME" -d "$INSTALL_TMP_DIR"
+
+if which 7z >/dev/null ; then
+    7z e "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME.zip" -o"$INSTALL_TMP_DIR"
+elif which unzip >/dev/null ; then
+    unzip "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME" -d "$INSTALL_TMP_DIR"
+else
+    echo "Cannot unzip, neither 7z nor unzip command is available!"
+    exit 1
+fi
 if [ $? -ne 0 ] ; then
+    cat "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME.zip"
     echo "Failed to unzip file!"
     rm -rf "$INSTALL_TMP_DIR"
     exit 1
@@ -64,7 +69,8 @@ EOF
     echo "Edit the config"
     echo -e "\t/etc/icon-metrics/config.yml"
     echo "Enable and start the service"
-    echo -e "\tsystemctl daemon-reload && systemctl enable --now icon-metrics.service"
+    echo -e "\tsystemctl daemon-reload"
+    echo -e "\tsystemctl enable --now icon-metrics.service"
 else
     echo "Edit the config"
     echo -e "\t/etc/icon-metrics/config.yml"
