@@ -1,3 +1,7 @@
 # Output
 icon-metrics
 icon-metrics.exe
+
+# IDE
+.vscode
+.idea
