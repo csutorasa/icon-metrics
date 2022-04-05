@@ -248,7 +248,7 @@ func (this *IconClient) removeSession() {
 	this.sessionId = ""
 }
 
-func unmarshalBody(res *http.Response, v interface{}) error {
+func unmarshalBody(res *http.Response, v any) error {
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err

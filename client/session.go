@@ -24,7 +24,7 @@ func NewSession(sysId string) *MetricsSession {
 func (this *MetricsSession) Report(values *DataPollResponse) {
 	if len(this.roomDescriptors) == 0 {
 		for id, thermostat := range values.Thermostats {
-			if thermostat.Enabled == 0 {
+			if thermostat.Enabled == 0 || thermostat.Live == 0 {
 				continue
 			}
 			this.roomDescriptors = append(this.roomDescriptors, roomDescriptor{Id: id, Name: thermostat.Name})
@@ -34,7 +34,7 @@ func (this *MetricsSession) Report(values *DataPollResponse) {
 	metrics.ExternalTemperatureGauge.WithLabelValues(this.sysId).Set(values.ExternalTemperature)
 	metrics.WaterTemperatureGauge.WithLabelValues(this.sysId).Set(values.WaterTemperature)
 	for id, thermostat := range values.Thermostats {
-		if thermostat.Enabled == 0 {
+		if thermostat.Enabled == 0 || thermostat.Live == 0 {
 			continue
 		}
 		metrics.RoomTemperatureGauge.WithLabelValues(this.sysId, id, thermostat.Name).Set(thermostat.Temperature)

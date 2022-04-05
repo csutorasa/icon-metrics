@@ -1,0 +1,15 @@
+# Changelog
+
+## 1.1.0
+
+Bump go version to 1.18
+Remove limit of 8kb for response data
+Update thermostat ignore filter with to check both Live and Enabled thermostats
+
+## 1.0.1
+
+Fail faster in case of server is down
+
+## 1.0.0
+
+Initial release

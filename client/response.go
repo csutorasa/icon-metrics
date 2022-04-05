@@ -117,9 +117,9 @@ const success = "success"
 const failure = "failure"
 
 type actionResponse struct {
-	Result  string                 `json:"result"`
-	Refresh bool                   `json:"refresh"`
-	Errors  map[string]interface{} `json:"errors"`
+	Result  string         `json:"result"`
+	Refresh bool           `json:"refresh"`
+	Errors  map[string]any `json:"errors"`
 }
 
 func (this *actionResponse) IsSuccess() bool {
