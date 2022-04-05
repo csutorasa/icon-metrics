@@ -5,9 +5,10 @@ ICON_METRICS_ARCH=${1:-amd64}
 
 INSTALL_TMP_DIR=~/.icon-metrics-install
 DOWNLOAD_URL="https://github.com/csutorasa/icon-metrics/releases/download/$ICON_METRICS_VERSION/icon-metrics-linux-$ICON_METRICS_ARCH.zip"
+
 mkdir -p $INSTALL_TMP_DIR
 if which curl >/dev/null ; then
-    curl $DOWNLOAD_URL --output $INSTALL_TMP_DIR
+    curl $DOWNLOAD_URL --output-dir $INSTALL_TMP_DIR
 elif which wget >/dev/null ; then
     wget $DOWNLOAD_URL -P $INSTALL_TMP_DIR
 else
@@ -26,7 +27,7 @@ mkdir -p /etc/icon-metrics
 mv $INSTALL_TMP_DIR/config.yml /etc/icon-metrics/
 rm -rf $INSTALL_TMP_DIR
 if which systemctl >/dev/null ; then
-    car /etc/systemd/system/icon-metrics.service << EOF
+    cat /etc/systemd/system/icon-metrics.service << EOF
 [Unit]
 Description=iCON metrics publisher
 
