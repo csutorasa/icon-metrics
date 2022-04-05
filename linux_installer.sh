@@ -7,7 +7,7 @@ INSTALL_TMP_DIR=~/.icon-metrics-install
 DOWNLOAD_FILENAME=icon-metrics-linux-$ICON_METRICS_ARCH.zip
 DOWNLOAD_URL="https://github.com/csutorasa/icon-metrics/releases/download/$ICON_METRICS_VERSION/$DOWNLOAD_FILENAME"
 
-if [[ ! -d "$INSTALL_TMP_DIR" ]] ; then
+if [[ -d "$INSTALL_TMP_DIR" ]] ; then
     echo "Temp directory $INSTALL_TMP_DIR exists!"
     exit 1
 fi
