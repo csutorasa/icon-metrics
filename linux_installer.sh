@@ -4,28 +4,33 @@ ICON_METRICS_VERSION="1.0.1"
 ICON_METRICS_ARCH=${1:-amd64}
 
 INSTALL_TMP_DIR=~/.icon-metrics-install
-DOWNLOAD_URL="https://github.com/csutorasa/icon-metrics/releases/download/$ICON_METRICS_VERSION/icon-metrics-linux-$ICON_METRICS_ARCH.zip"
+DOWNLOAD_FILENAME=icon-metrics-linux-$ICON_METRICS_ARCH.zip
+DOWNLOAD_URL="https://github.com/csutorasa/icon-metrics/releases/download/$ICON_METRICS_VERSION/$DOWNLOAD_FILENAME"
 
 mkdir -p $INSTALL_TMP_DIR
 if which curl >/dev/null ; then
-    curl $DOWNLOAD_URL --output-dir $INSTALL_TMP_DIR
+    curl $DOWNLOAD_URL --output "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME"
 elif which wget >/dev/null ; then
-    wget $DOWNLOAD_URL -P $INSTALL_TMP_DIR
+    wget $DOWNLOAD_URL -P "$INSTALL_TMP_DIR"
 else
     echo "Cannot download zip, neither curl nor wget command is available"
+    exit 1
+fi
+if [ $? -ne 0 ] ; then
+    echo "Failed to download file"
     exit 1
 fi
 if ! which unzip >/dev/null ; then 
     echo "Cannot unzip, unzip command is available"
     exit 1
 fi
-unzip $INSTALL_TMP_DIR/icon-metrics-*.zip -d $INSTALL_TMP_DIR
+unzip "$INSTALL_TMP_DIR/$DOWNLOAD_FILENAME" -d "$INSTALL_TMP_DIR"
 mkdir -p /usr/local/bin/
-mv $INSTALL_TMP_DIR/icon-metrics /usr/local/bin/
+mv "$INSTALL_TMP_DIR/icon-metrics" /usr/local/bin/
 chmod +x /usr/local/bin/icon-metrics
 mkdir -p /etc/icon-metrics
-mv $INSTALL_TMP_DIR/config.yml /etc/icon-metrics/
-rm -rf $INSTALL_TMP_DIR
+mv "$INSTALL_TMP_DIR/config.yml" /etc/icon-metrics/
+rm -rf "$INSTALL_TMP_DIR"
 if which systemctl >/dev/null ; then
     cat /etc/systemd/system/icon-metrics.service << EOF
 [Unit]
