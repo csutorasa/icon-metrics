@@ -22,7 +22,7 @@ devices:
 Download the application from [GitHub releases](https://github.com/csutorasa/icon-metrics/releases) and unzip it.
 
 ```bash
-wget https://github.com/csutorasa/icon-metrics/releases/download/1.0.0/icon-metrics-linux-amd64.zip
+wget https://github.com/csutorasa/icon-metrics/releases/download/1.1.1/icon-metrics-linux-amd64.zip
 unzip icon-metrics-linux-amd64.zip
 ```
 
