@@ -51,7 +51,7 @@ Restart=always
 [Automatic install script](linux_installer.sh)
 
 ```bash
-sudo curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | bash -s amd64
+curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | sudo bash -s amd64
 ```
 
 ## Docker image
