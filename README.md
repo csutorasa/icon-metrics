@@ -54,6 +54,16 @@ Restart=always
 sudo curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | bash -s amd64
 ```
 
+## Docker image
+
+Create your config.yml and run the command below
+
+```bash
+docker run -d -v /path/to/your/config.yml:/app/config.yml -p8080:8080 csutorasa/icon-metrics:latest
+```
+
+If you do not want use 8080 port then use `-p${YOUR_PORT}:8080`.
+
 ## Metrics
 
 Metrics are hosted in [prometheus](https://prometheus.io/) format.
