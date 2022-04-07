@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "iCon metrics config",
+  "type": "object",
+  "description": "icon metrics configuration",
+  "required": ["devices"],
+  "properties": {
+    "port": {
+      "type": "integer",
+      "description": "Port to run on",
+      "default": 80
+    },
+    "devices": {
+      "type": "array",
+      "description": "List of devices to monitor",
+      "items": {
+        "type": "object",
+        "description": "Device configuration",
+        "required": ["url", "sysid"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Url of the device",
+            "pattern": "https?://.+"
+          },
+          "sysid": {
+            "type": "string",
+            "description": "Id of the device",
+            "pattern": "\\d{12}"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the device"
+          },
+          "delay": {
+            "type": "integer",
+            "description": "Delay between scrape calls",
+            "minimum": 1,
+            "maximum": 3600,
+            "default": 60
+          }
+        }
+      }
+    }
+  }
+}

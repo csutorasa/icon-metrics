@@ -3,5 +3,6 @@ icon-metrics
 icon-metrics.exe
 
 # IDE
-.vscode
+.vscode/*
+!.vscode/settings.json
 .idea

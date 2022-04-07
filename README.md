@@ -8,14 +8,17 @@ Data is read from the control system(s).
 To define the control systems to be scraped, [config file](config.yml) needs to be updated.
 
 ```yaml
+port: 8080 # port to run on (defaults to 80)
 devices:
   - url: http://192.168.1.10 # device address
     sysid: '123123123123' # device ID (printed on the controller)
-    password: '123123123123' # password (same as sysid if empty)
-    delay: 60 # delay in seconds between reads (default 60)
+    password: '123123123123' # password (defaults to sysid if empty)
+    delay: 15 # delay in seconds between reads (defaults to 60)
   - url: http://192.168.1.11 # device address
     sysid: '321321321321' # device ID (printed on the controller)
 ```
+
+Config.yml validation can be done via the [schema](config.schema.json).
 
 ## Install on linux
 
