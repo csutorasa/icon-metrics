@@ -10,10 +10,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+// HTTP server
 type Publisher struct {
 	server *http.Server
 }
 
+// Creates a new server with the given port
 func NewPrometherusPublisher(port int) *Publisher {
 	publisher := &Publisher{}
 	publisher.server = &http.Server{
@@ -26,7 +28,8 @@ func NewPrometherusPublisher(port int) *Publisher {
 	return publisher
 }
 
-func (this *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// Main logic of the server.
+func (publisher *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/metrics" {
 		if r.Method == http.MethodGet {
 			promhttp.Handler().ServeHTTP(w, r)
@@ -45,21 +48,24 @@ func (this *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (this *Publisher) Start() error {
-	ln, err := net.Listen("tcp", this.server.Addr)
+// Starts to listen and serve.
+func (publisher *Publisher) Start() error {
+	ln, err := net.Listen("tcp", publisher.server.Addr)
 	if err != nil {
 		return err
 	}
 	go func() {
-		this.server.Serve(ln)
+		publisher.server.Serve(ln)
 	}()
 	return nil
 }
 
-func (this *Publisher) Stop(context context.Context) error {
-	return this.server.Shutdown(context)
+// Stops serving and listening.
+func (publisher *Publisher) Stop(context context.Context) error {
+	return publisher.server.Shutdown(context)
 }
 
-func (this *Publisher) Close() error {
-	return this.server.Close()
+// Cleans up resources.
+func (publisher *Publisher) Close() error {
+	return publisher.server.Close()
 }

@@ -4,11 +4,13 @@ import (
 	"fmt"
 )
 
+// Experimental!
 type ThermostatSettings map[int]*ThermostatSetting
 
-func (this ThermostatSettings) ToValues(tab int) map[string][]string {
+// Experimental!
+func (settings ThermostatSettings) ToValues(tab int) map[string][]string {
 	data := make(map[string][]string)
-	for signal, thermosSetting := range this {
+	for signal, thermosSetting := range settings {
 		for key, value := range thermosSetting.ToValues(tab, signal) {
 			data[key] = value
 		}
@@ -18,6 +20,7 @@ func (this ThermostatSettings) ToValues(tab int) map[string][]string {
 	return data
 }
 
+// Experimental!
 type ThermostatSetting struct {
 	HeatingCooling              bool
 	Installed                   bool
@@ -33,33 +36,35 @@ type ThermostatSetting struct {
 	RegBCooling                 float64
 }
 
-func (this *ThermostatSetting) ToValues(tab int, signal int) map[string][]string {
+// Experimental!
+func (setting *ThermostatSetting) ToValues(tab int, signal int) map[string][]string {
 	id := fmt.Sprintf("%d_%d", tab, signal)
 	data := map[string][]string{
-		("cooling@" + id): {fmt.Sprintf("%.1f", this.CoolingTargetTemperature)},
-		("heating@" + id): {fmt.Sprintf("%.1f", this.HeatingTargetTemperature)},
-		("ecoc@" + id):    {fmt.Sprintf("%.1f", this.EcoCoolingTargetTemperature)},
-		("ecoh@" + id):    {fmt.Sprintf("%.1f", this.EcoHeatingTargetTemperature)},
-		("name@" + id):    {this.Name},
-		("lim@" + id):     {fmt.Sprintf("%.1f", this.ManualRange)},
-		("dxh@" + id):     {fmt.Sprintf("%.1f", this.RegBHeating)},
-		("dxc@" + id):     {fmt.Sprintf("%.1f", this.RegBCooling)},
+		("cooling@" + id): {fmt.Sprintf("%.1f", setting.CoolingTargetTemperature)},
+		("heating@" + id): {fmt.Sprintf("%.1f", setting.HeatingTargetTemperature)},
+		("ecoc@" + id):    {fmt.Sprintf("%.1f", setting.EcoCoolingTargetTemperature)},
+		("ecoh@" + id):    {fmt.Sprintf("%.1f", setting.EcoHeatingTargetTemperature)},
+		("name@" + id):    {setting.Name},
+		("lim@" + id):     {fmt.Sprintf("%.1f", setting.ManualRange)},
+		("dxh@" + id):     {fmt.Sprintf("%.1f", setting.RegBHeating)},
+		("dxc@" + id):     {fmt.Sprintf("%.1f", setting.RegBCooling)},
 	}
-	if this.HeatingCooling {
+	if setting.HeatingCooling {
 		data["hc@"+id] = []string{"on"}
 	}
-	if this.Installed {
+	if setting.Installed {
 		data["installed@"+id] = []string{"on"}
 	}
-	if this.Cef {
+	if setting.Cef {
 		data["cef@"+id] = []string{"on"}
 	}
-	if this.Cec {
+	if setting.Cec {
 		data["cec@"+id] = []string{"on"}
 	}
 	return data
 }
 
+// Experimental!
 type GeneralSettings struct {
 	ComfortEcoMode              string
 	ComfortEcoTab               int
@@ -73,19 +78,20 @@ type GeneralSettings struct {
 	EcoCoolingTargetTemperature int
 }
 
-func (this *GeneralSettings) ToValues(tab int) map[string][]string {
+// Experimental!
+func (settings *GeneralSettings) ToValues(tab int) map[string][]string {
 	id := fmt.Sprintf("%d", tab)
 	return map[string][]string{
-		"func@ce_0":   {this.ComfortEcoMode},
-		"icon@ce_0":   {fmt.Sprintf("%d", this.ComfortEcoTab)},
-		"signal@ce_0": {fmt.Sprintf("%d", this.ComfortEcoSignal)},
-		"func@hc_0":   {this.HeatingCoolingMode},
-		"icon@hc_0":   {fmt.Sprintf("%d", this.HeatingCoolingTab)},
-		"signal@hc_0": {fmt.Sprintf("%d", this.HeatingCoolingSignal)},
-		"xah":         {fmt.Sprintf("%d", this.HeatingTargetTemperature)},
-		"xac":         {fmt.Sprintf("%d", this.CoolingTargetTemperature)},
-		"ecoh":        {fmt.Sprintf("%d", this.EcoHeatingTargetTemperature)},
-		"ecoc":        {fmt.Sprintf("%d", this.EcoCoolingTargetTemperature)},
+		"func@ce_0":   {settings.ComfortEcoMode},
+		"icon@ce_0":   {fmt.Sprintf("%d", settings.ComfortEcoTab)},
+		"signal@ce_0": {fmt.Sprintf("%d", settings.ComfortEcoSignal)},
+		"func@hc_0":   {settings.HeatingCoolingMode},
+		"icon@hc_0":   {fmt.Sprintf("%d", settings.HeatingCoolingTab)},
+		"signal@hc_0": {fmt.Sprintf("%d", settings.HeatingCoolingSignal)},
+		"xah":         {fmt.Sprintf("%d", settings.HeatingTargetTemperature)},
+		"xac":         {fmt.Sprintf("%d", settings.CoolingTargetTemperature)},
+		"ecoh":        {fmt.Sprintf("%d", settings.EcoHeatingTargetTemperature)},
+		"ecoc":        {fmt.Sprintf("%d", settings.EcoCoolingTargetTemperature)},
 		"tab":         {id},
 		"form":        {"general"},
 	}

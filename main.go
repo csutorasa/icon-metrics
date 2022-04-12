@@ -1,3 +1,4 @@
+// Main application package.
 package main
 
 import (
@@ -14,8 +15,8 @@ import (
 	"github.com/csutorasa/icon-metrics/metrics"
 )
 
+// Main logger instance
 var logger *log.Logger = log.Default()
-var startTime time.Time = time.Now()
 
 func main() {
 	configPath := parseArgs()
@@ -27,21 +28,21 @@ func main() {
 
 	metrics.RegisterUptime()
 
-	logger.Printf("Starting prometheus server on port %d", c.Port)
+	logger.Printf("Starting http server on port %d", c.Port)
 	start := metrics.NewTimer()
 	p := NewPrometherusPublisher(c.Port)
 
 	err = p.Start()
 	if err != nil {
-		logger.Panicf("Failed to start prometheus server on port %d caused by %s", c.Port, err.Error())
+		logger.Panicf("Failed to start http server on port %d caused by %s", c.Port, err.Error())
 	}
 	defer func() {
 		start := metrics.NewTimer()
-		logger.Printf("Stopping prometheus server on port %d", c.Port)
+		logger.Printf("Stopping http server on port %d", c.Port)
 		p.Close()
-		logger.Printf("Successfully stopped Prometheus server on port %d under %s", c.Port, start.End().String())
+		logger.Printf("Successfully stopped http server on port %d under %s", c.Port, start.End().String())
 	}()
-	logger.Printf("Successfully started Prometheus server on port %d under %s", c.Port, start.End().String())
+	logger.Printf("Successfully started http server on port %d under %s", c.Port, start.End().String())
 
 	var wg sync.WaitGroup
 	channels := make([]chan int, 0)
@@ -52,7 +53,7 @@ func main() {
 			continue
 		}
 		delay := time.Duration(device.Delay) * time.Second
-		ch := make(chan int, 0)
+		ch := make(chan int)
 		channels = append(channels, ch)
 		wg.Add(1)
 		go func() {
@@ -76,6 +77,7 @@ func main() {
 	}
 }
 
+// Parses configuration file path from command line options
 func parseArgs() string {
 	configPath := flag.String("config", "", "Configuration file url")
 	flag.Parse()
@@ -86,6 +88,7 @@ func parseArgs() string {
 	return *configPath
 }
 
+// Returns configuration from file.
 func readConfig(configPath string) (*Configuration, error) {
 	logger.Printf("Loading configuration from %s", configPath)
 	c, err := ReadConfig(configPath)
@@ -96,6 +99,7 @@ func readConfig(configPath string) (*Configuration, error) {
 	return c, nil
 }
 
+// Handles OS signals for shutdown.
 func interruptHandler(channels []chan int) {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGABRT)
@@ -118,7 +122,6 @@ func interruptHandler(channels []chan int) {
 					logger.Printf("SIGINT received again, force shutdown initiated")
 					os.Exit(0)
 				}
-				break
 			case syscall.SIGTERM:
 				logger.Printf("SIGTERM received, force shutdown initiated")
 				os.Exit(0)
@@ -130,6 +133,7 @@ func interruptHandler(channels []chan int) {
 	}()
 }
 
+// Main loop for handling a single iCON device.
 func reportValues(c *client.IconClient, trigger chan int, d time.Duration) {
 	session := client.NewSession(c.SysId())
 	for {
@@ -165,6 +169,7 @@ func reportValues(c *client.IconClient, trigger chan int, d time.Duration) {
 	}
 }
 
+// Sleeps for the duration, which can be interrupted.
 func sleep(trigger chan int, d time.Duration) int {
 	go func() {
 		time.Sleep(d)

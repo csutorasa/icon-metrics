@@ -6,19 +6,23 @@ import (
 	"strings"
 )
 
+// Heating or cooling enum type
 type HC int
-type CE int
 
 const (
 	Heating HC = 0
 	Cooling HC = 1
 )
 
+// Comfort or eco enum type
+type CE int
+
 const (
 	Comfort CE = 0
 	Eco     CE = 1
 )
 
+// Generic thermostat response
 type DataPollResponse struct {
 	SysId                       string         `json:"SYSID"`
 	SERVICE                     int            `json:"SERVICE"`
@@ -44,22 +48,24 @@ type DataPollResponse struct {
 	TPR                         TPR            `json:"TPR"`
 }
 
-func (this *DataPollResponse) TargetTemperature() float64 {
-	if this.HeatingCooling == Heating {
-		if this.ComfortEco == Comfort {
-			return this.HeatingTargetTemperature
+// Calculates the target temperature from heating/cooling and comfort/eco.
+func (response *DataPollResponse) TargetTemperature() float64 {
+	if response.HeatingCooling == Heating {
+		if response.ComfortEco == Comfort {
+			return response.HeatingTargetTemperature
 		} else {
-			return this.EcoHeatingTargetTemperature
+			return response.EcoHeatingTargetTemperature
 		}
 	} else {
-		if this.ComfortEco == Comfort {
-			return this.CoolingTargetTemperature
+		if response.ComfortEco == Comfort {
+			return response.CoolingTargetTemperature
 		} else {
-			return this.EcoCoolingTargetTemperature
+			return response.EcoCoolingTargetTemperature
 		}
 	}
 }
 
+// Thermostat data
 type DP struct {
 	Enabled                     int     `json:"ON"`
 	IHC                         int     `json:"IHC"`
@@ -89,18 +95,19 @@ type DP struct {
 	Name                        string  `json:"NAME"`
 }
 
-func (this *DP) TargetTemperature() float64 {
-	if this.HeatingCooling == Heating {
-		if this.ComfortEco == Comfort {
-			return this.HeatingTargetTemperature
+// Calculates the target temperature from heating/cooling and comfort/eco.
+func (dp *DP) TargetTemperature() float64 {
+	if dp.HeatingCooling == Heating {
+		if dp.ComfortEco == Comfort {
+			return dp.HeatingTargetTemperature
 		} else {
-			return this.EcoHeatingTargetTemperature
+			return dp.EcoHeatingTargetTemperature
 		}
 	} else {
-		if this.ComfortEco == Comfort {
-			return this.CoolingTargetTemperature
+		if dp.ComfortEco == Comfort {
+			return dp.CoolingTargetTemperature
 		} else {
-			return this.EcoCoolingTargetTemperature
+			return dp.EcoCoolingTargetTemperature
 		}
 	}
 }
@@ -113,22 +120,22 @@ type TPR struct {
 type TPRData struct {
 }
 
-const success = "success"
-const failure = "failure"
-
+// Action response.
 type actionResponse struct {
 	Result  string         `json:"result"`
 	Refresh bool           `json:"refresh"`
 	Errors  map[string]any `json:"errors"`
 }
 
-func (this *actionResponse) IsSuccess() bool {
-	return this.Result == "success"
+// Returns if the action was successful.
+func (response *actionResponse) IsSuccess() bool {
+	return response.Result == "success"
 }
 
-func (this *actionResponse) CreateError() error {
+// Returns a new error with the content of th errors.
+func (response *actionResponse) CreateError() error {
 	var sb strings.Builder
-	for error, data := range this.Errors {
+	for error, data := range response.Errors {
 		sb.WriteString(error)
 		sb.WriteString(" ")
 		sb.WriteString(fmt.Sprintf("%v", data))
