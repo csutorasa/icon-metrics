@@ -28,9 +28,20 @@ func NewPrometherusPublisher(port int) *Publisher {
 
 func (this *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/metrics" {
-		promhttp.Handler().ServeHTTP(w, r)
+		if r.Method == http.MethodGet {
+			promhttp.Handler().ServeHTTP(w, r)
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	} else if r.URL.Path == "/status" {
+		if r.Method == http.MethodGet {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	} else {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 	}
 }
 

@@ -71,10 +71,10 @@ func (this *IconClient) Login() error {
 	defer res.Body.Close()
 	metrics.HttpGauge.WithLabelValues(this.sysId, "login", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
 	if res.StatusCode != 200 {
-		return errors.New(fmt.Sprintf("Failed to login, status code %d", res.StatusCode))
+		return fmt.Errorf("failed to login, status code %d", res.StatusCode)
 	}
 	if !this.updateCookie(res.Cookies()) {
-		return errors.New("No session was found")
+		return errors.New("no session was found")
 	}
 	data := actionResponse{}
 	err = unmarshalBody(res, &data)
@@ -110,9 +110,9 @@ func (this *IconClient) ReadValues() (*DataPollResponse, error) {
 	}
 	defer res.Body.Close()
 	metrics.HttpGauge.WithLabelValues(this.sysId, "read_values", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
-	if res.StatusCode != 200 {
+	if res.StatusCode != http.StatusOK {
 		this.removeSession()
-		return nil, errors.New(fmt.Sprintf("Failed to read data, status code %d", res.StatusCode))
+		return nil, fmt.Errorf("failed to read data, status code %d", res.StatusCode)
 	}
 	this.updateCookie(res.Cookies())
 	data := &DataPollResponse{}
@@ -144,7 +144,7 @@ func (this *IconClient) SetThermostatSettings(tab int, thermosSettings Thermosta
 	metrics.HttpGauge.WithLabelValues(this.sysId, "set_thermostat_settings", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
 	if res.StatusCode != 200 {
 		this.removeSession()
-		return errors.New(fmt.Sprintf("Failed to read data, status code %d", res.StatusCode))
+		return fmt.Errorf("failed to read data, status code %d", res.StatusCode)
 	}
 	this.updateCookie(res.Cookies())
 	data := &actionResponse{}
@@ -177,9 +177,9 @@ func (this *IconClient) SetGeneralSettings(tab int, generalSettings *GeneralSett
 	}
 	defer res.Body.Close()
 	metrics.HttpGauge.WithLabelValues(this.sysId, "set_general_settings", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
-	if res.StatusCode != 200 {
+	if res.StatusCode != http.StatusOK {
 		this.removeSession()
-		return errors.New(fmt.Sprintf("Failed to read data, status code %d", res.StatusCode))
+		return fmt.Errorf("failed to read data, status code %d", res.StatusCode)
 	}
 	this.updateCookie(res.Cookies())
 	data := &actionResponse{}
@@ -214,8 +214,8 @@ func (this *IconClient) Logout() error {
 	defer res.Body.Close()
 	metrics.HttpGauge.WithLabelValues(this.sysId, "logout", strconv.Itoa(res.StatusCode)).Observe(timer.End().Seconds())
 	this.removeSession()
-	if res.StatusCode != 200 {
-		return errors.New(fmt.Sprintf("Failed to logout, status code %d", res.StatusCode))
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to logout, status code %d", res.StatusCode)
 	}
 	return nil
 }
