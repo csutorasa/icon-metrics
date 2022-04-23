@@ -1,9 +1,19 @@
-port: 8080 # http server port to host metrics on
+# port: 80 # http server port to host metrics on
 devices:
-  #- url: http://192.168.1.10 # device address
-  #  sysid: '123123123123' # device ID (printed on the controller)
-  #  password: '123123123123' # password (same as sysid if empty)
-  #  delay: 60 # delay in seconds between reads
+#  - url: http://192.168.1.10 # device address
+#    sysid: '123123123123' # device ID (printed on the controller)
+#    password: '123123123123' # password (same as sysid if empty)
+#    delay: 60 # delay in seconds between reads
+#    report: # reported metrics configuration
+#      roomConnected: true # if icon_room_connected metric is reported
+#      httpClient: true # if icon_http_client_seconds metric is reported
+#      externalTemperature: true # if icon_external_temperature metric is reported
+#      waterTemperature: true # if icon_water_temperature metric is reported
+#      temperature: true # if icon_temperature metric is reported
+#      relay: true # if icon_relay_on metric is reported
+#      humidity: true # if icon_humidity metric is reported
+#      targetTemperature: true # if icon_target_temperature metric is reported
+#      dewTemperature: true # if icon_dew_temperature metric is reported
   
-  #- url: http://192.168.1.11 # device address
-  #  sysid: '321321321321' # device ID (printed on the controller)
+#  - url: http://192.168.1.11 # device address
+#    sysid: '321321321321' # device ID (printed on the controller)

@@ -1,6 +1,8 @@
 # iCON-metrics
 
 This is an command line application which reads data from [NGBS iCON smart home control systems](https://www.ngbsh.hu/en/icon.html).
+The data is processed and is exposed to be scraped from [prometheus](https://prometheus.io/).
+Data from prometheus can be display in different ways, but [grafana](https://grafana.com/) is recommended.
 
 ## Read data
 
@@ -19,13 +21,14 @@ devices:
 ```
 
 Config.yml validation can be done via the [schema](config.schema.json).
+For further configuration options use the [schema](config.schema.json) to explore and validate your config file.
 
 ## Install on linux
 
 Download the application from [GitHub releases](https://github.com/csutorasa/icon-metrics/releases) and unzip it.
 
 ```bash
-wget https://github.com/csutorasa/icon-metrics/releases/download/1.1.1/icon-metrics-linux-amd64.zip
+wget https://github.com/csutorasa/icon-metrics/releases/download/1.2.0/icon-metrics-linux-amd64.zip
 unzip icon-metrics-linux-amd64.zip
 ```
 
@@ -69,6 +72,8 @@ If you do not want use 8080 port then use `-p${YOUR_PORT}:8080`.
 
 ## Metrics
 
+### Prometheus scraper
+
 Metrics are hosted in [prometheus](https://prometheus.io/) format.
 The http server port can be configured in the [config file](config.yml).
 
@@ -87,21 +92,29 @@ scrape_configs:
     - targets: ['localhost:8080']
 ```
 
+### Metrics reporting
+
+Most metrics can be disabled from the configuaration separately for each device in the [config file](config.yml).
+
 Available metrics:
 
-| Metric                    | Type    | Description                                         |
-| ------------------------- | ------- | --------------------------------------------------- |
-| uptime                    | gauge   | uptime in milliseconds                              |
-| icon_controller_connected | gauge   | 1 if the controller is ready to be read 0 otherwise |
-| icon_http_client_seconds  | summary | icon HTTP request durations in seconds              |
-| icon_external_temperature | gauge   | external temperature                                |
-| icon_water_temperature    | gauge   | water temperature                                   |
-| icon_temperature          | gauge   | room temperature                                    |
-| icon_relay_on             | gauge   | 1 if room relay is open 0 otherwise                 |
-| icon_humidity             | gauge   | room humidity                                       |
-| icon_target_temperature   | gauge   | room target temperature                             |
-| icon_dew_temperature      | gauge   | room dew temperature                                |
+| Metric                    | Type    | Description                                          | Enable configuration flag |
+| ------------------------- | ------- | ---------------------------------------------------- | ------------------------- |
+| uptime                    | gauge   | uptime in milliseconds                               | N/A                       |
+| icon_controller_connected | gauge   | 1 if the controller is ready to be read 0 otherwise  | N/A                       |
+| icon_room_connected       | gauge   | 1 if the room is connected to the device 0 otherwise | roomConnected             |
+| icon_http_client_seconds  | summary | icon HTTP request durations in seconds               | httpClient                |
+| icon_external_temperature | gauge   | external temperature                                 | externalTemperature       |
+| icon_water_temperature    | gauge   | water temperature                                    | waterTemperature          |
+| icon_temperature          | gauge   | room temperature                                     | temperature               |
+| icon_relay_on             | gauge   | 1 if room relay is open 0 otherwise                  | relay                     |
+| icon_humidity             | gauge   | room humidity                                        | humidity                  |
+| icon_target_temperature   | gauge   | room target temperature                              | targetTemperature         |
+| icon_dew_temperature      | gauge   | room dew temperature                                 | dewTemperature            |
 
 ## Grafana dashboard
+
+This data is designed to be displayed in a [grafana dashboard](https://grafana.com/docs/grafana/latest/dashboards/).
+An [example dashboard](grafana.json) is available to be [imported](https://grafana.com/docs/grafana/latest/dashboards/export-import/).
 
 ![grafana_image](https://user-images.githubusercontent.com/6968192/112884441-ce609c00-90cf-11eb-86e5-9dce7dab8e2a.png)
