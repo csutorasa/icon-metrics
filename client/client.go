@@ -39,7 +39,6 @@ func NewIconClient(urlStr string, sysId string, password string) (*IconClient, e
 	if err != nil {
 		return nil, err
 	}
-	metrics.ConntectedGauge.WithLabelValues(sysId).Set(0)
 	return &IconClient{
 		client: &http.Client{
 			Transport: &http.Transport{
@@ -95,7 +94,6 @@ func (client *IconClient) Login() error {
 		client.removeSession()
 		return data.CreateError()
 	}
-	metrics.ConntectedGauge.WithLabelValues(client.sysId).Set(1)
 	return nil
 }
 
@@ -266,7 +264,6 @@ func (client *IconClient) SysId() string {
 // Cleans up the client.
 func (client *IconClient) Close() error {
 	err := client.Logout()
-	metrics.ConntectedGauge.DeleteLabelValues(client.sysId)
 	return err
 }
 
@@ -282,7 +279,6 @@ func (client *IconClient) getPath(p string) (*url.URL, error) {
 
 // Removes metrics and session data.
 func (client *IconClient) removeSession() {
-	metrics.ConntectedGauge.WithLabelValues(client.sysId).Set(0)
 	client.sessionId = ""
 }
 

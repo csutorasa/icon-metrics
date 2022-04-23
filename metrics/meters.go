@@ -20,7 +20,7 @@ var roomParameters = append(genericParameters, "id", "room")
 // Reports if the device connection is active or not.
 var ConntectedGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 	Name: "icon_controller_connected",
-	Help: "Read values",
+	Help: "Reports if controller is connected",
 }, genericParameters)
 
 // Reports the HTTP response status code along with the duration.
@@ -52,6 +52,12 @@ var ExternalTemperatureGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 	Name: "icon_external_temperature",
 	Help: "External temperature",
 }, genericParameters)
+
+// Reports if the device connection is active or not.
+var RoomConntectedGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	Name: "icon_room_connected",
+	Help: "Reports if room is connected",
+}, roomParameters)
 
 // Reports the room temperature.
 var RoomTemperatureGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{

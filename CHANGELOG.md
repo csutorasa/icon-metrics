@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+New configuration flags to disable metrics, so disk space can be saved.
+New metric added `icon_room_connected`.
+
 ## 1.1.1
 
 Stripping executables, removes all debug information to reduce executable size.

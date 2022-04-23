@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/csutorasa/icon-metrics/client"
+	"github.com/csutorasa/icon-metrics/config"
 	"github.com/csutorasa/icon-metrics/metrics"
 )
 
@@ -56,19 +57,21 @@ func main() {
 		ch := make(chan int)
 		channels = append(channels, ch)
 		wg.Add(1)
+		reportConfig := device.Report
 		go func() {
 			defer wg.Done()
 			defer func() {
 				start := metrics.NewTimer()
 				logger.Printf("Disonnecting from %s", client.SysId())
 				err := client.Close()
+				metrics.ConntectedGauge.DeleteLabelValues(client.SysId())
 				if err != nil {
 					logger.Printf("Failed to disonnect from %s caused by %s", client.SysId(), err.Error())
 				} else {
 					logger.Printf("Successfully disconnected from %s under %s", client.SysId(), start.End().String())
 				}
 			}()
-			reportValues(client, ch, delay)
+			reportValues(client, reportConfig, ch, delay)
 		}()
 	}
 	if len(channels) != 0 {
@@ -89,9 +92,9 @@ func parseArgs() string {
 }
 
 // Returns configuration from file.
-func readConfig(configPath string) (*Configuration, error) {
+func readConfig(configPath string) (*config.Configuration, error) {
 	logger.Printf("Loading configuration from %s", configPath)
-	c, err := ReadConfig(configPath)
+	c, err := config.ReadConfig(configPath)
 	if err != nil {
 		return nil, err
 	}
@@ -134,14 +137,16 @@ func interruptHandler(channels []chan int) {
 }
 
 // Main loop for handling a single iCON device.
-func reportValues(c *client.IconClient, trigger chan int, d time.Duration) {
-	session := client.NewSession(c.SysId())
+func reportValues(c *client.IconClient, reportConfig *config.ReportConfiguration, trigger chan int, d time.Duration) {
+	session := client.NewSession(c.SysId(), reportConfig)
+	metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(0)
 	for {
 		if !c.IsLoggedIn() {
 			logger.Printf("Connecting to %s", c.SysId())
 			err := c.Login()
 			if err != nil {
 				logger.Printf("Failed to connect to %s caused by %s", c.SysId(), err.Error())
+				metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(0)
 				session.Reset()
 				value := sleep(trigger, d)
 				if value > 0 {
@@ -150,10 +155,12 @@ func reportValues(c *client.IconClient, trigger chan int, d time.Duration) {
 				continue
 			}
 			logger.Printf("Connected to %s", c.SysId())
+			metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(1)
 		}
 		values, err := c.ReadValues()
 		if err != nil {
 			logger.Printf("Failed to read values from %s caused by %s", c.SysId(), err.Error())
+			metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(0)
 			session.Reset()
 			value := sleep(trigger, d)
 			if value > 0 {

@@ -38,6 +38,57 @@
             "minimum": 1,
             "maximum": 3600,
             "default": 60
+          },
+          "report": {
+            "type": "object",
+            "description": "Configuration of reported values",
+            "properties": {
+              "httpClient": {
+                "type": "boolean",
+                "description": "Enables reporting icon_http_client_seconds",
+                "defaultValue": true
+              },
+              "waterTemperature": {
+                "type": "boolean",
+                "description": "Enables reporting icon_water_temperature",
+                "defaultValue": true
+              },
+              "externalTemperature": {
+                "type": "boolean",
+                "description": "Enables reporting icon_external_temperature",
+                "defaultValue": true
+              },
+              "roomConnected": {
+                "type": "boolean",
+                "description": "Enables reporting icon_room_connected",
+                "defaultValue": true
+              },
+              "temperature": {
+                "type": "boolean",
+                "description": "Enables reporting icon_temperature",
+                "defaultValue": true
+              },
+              "dewTemperature": {
+                "type": "boolean",
+                "description": "Enables reporting icon_dew_temperature",
+                "defaultValue": true
+              },
+              "relay": {
+                "type": "boolean",
+                "description": "Enables reporting icon_relay_on",
+                "defaultValue": true
+              },
+              "humidity": {
+                "type": "boolean",
+                "description": "Enables reporting icon_humidity",
+                "defaultValue": true
+              },
+              "targetTemperature": {
+                "type": "boolean",
+                "description": "Enables reporting icon_target_temperature",
+                "defaultValue": true
+              }
+            }
           }
         }
       }
