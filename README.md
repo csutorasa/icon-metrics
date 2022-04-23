@@ -117,4 +117,4 @@ Available metrics:
 This data is designed to be displayed in a [grafana dashboard](https://grafana.com/docs/grafana/latest/dashboards/).
 An [example dashboard](grafana.json) is available to be [imported](https://grafana.com/docs/grafana/latest/dashboards/export-import/).
 
-![grafana_image](https://user-images.githubusercontent.com/6968192/112884441-ce609c00-90cf-11eb-86e5-9dce7dab8e2a.png)
+![grafana_image](https://user-images.githubusercontent.com/6968192/164945203-c4c97804-d30a-498e-9c6f-9cbee4633f12.png)
