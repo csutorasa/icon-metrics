@@ -65,7 +65,7 @@ func (client *IconClient) Login() error {
 		"tab":      []string{"login"},
 		"form":     []string{"login"},
 	}
-	req, err := http.NewRequest("POST", client.url.String(), strings.NewReader(formData.Encode()))
+	req, err := http.NewRequest(http.MethodPost, client.url.String(), strings.NewReader(formData.Encode()))
 	if err != nil {
 		metrics.HttpGauge.WithLabelValues(client.sysId, "login", "0").Observe(timer.End().Seconds())
 		return err
@@ -108,7 +108,7 @@ func (client *IconClient) ReadValues() (*DataPollResponse, error) {
 		metrics.HttpGauge.WithLabelValues(client.sysId, "read_values", "0").Observe(timer.End().Seconds())
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(fomrData.Encode()))
+	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(fomrData.Encode()))
 	if err != nil {
 		metrics.HttpGauge.WithLabelValues(client.sysId, "read_values", "0").Observe(timer.End().Seconds())
 		return nil, err
@@ -146,7 +146,7 @@ func (client *IconClient) SetThermostatSettings(tab int, thermosSettings Thermos
 		metrics.HttpGauge.WithLabelValues(client.sysId, "set_thermostat_settings", "0").Observe(timer.End().Seconds())
 		return err
 	}
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(fomrData.Encode()))
+	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(fomrData.Encode()))
 	if err != nil {
 		metrics.HttpGauge.WithLabelValues(client.sysId, "set_thermostat_settings", "0").Observe(timer.End().Seconds())
 		return err
