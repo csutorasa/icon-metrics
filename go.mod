@@ -3,7 +3,7 @@ module github.com/csutorasa/icon-metrics
 go 1.19
 
 require (
-	github.com/prometheus/client_golang v1.12.2
+	github.com/prometheus/client_golang v1.13.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
