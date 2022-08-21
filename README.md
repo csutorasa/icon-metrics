@@ -72,6 +72,16 @@ If you do not want use 8080 port then use `-p${YOUR_PORT}:8080`.
 
 ## Metrics
 
+```mermaid
+graph TD
+    A1[iCON thermostat controller 1] -->|Reads values| B[iCON-metrics]
+    A2[iCON thermostat controller 2] -->|Reads values| B[iCON-metrics]
+    A3[iCON thermostat controller 3] -->|Reads values| B[iCON-metrics]
+    B -->|Reports metrics| C[(Prometheus)]
+    C -->|Provides data| D[Grafana]
+    D --> E[Browser]
+```
+
 ### Prometheus scraper
 
 Metrics are hosted in [prometheus](https://prometheus.io/) format.
