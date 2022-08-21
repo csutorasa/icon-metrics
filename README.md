@@ -82,6 +82,23 @@ graph TD
     D --> E[Browser]
 ```
 
+```mermaid
+sequenceDiagram
+    participant it as iCON thermostat controller
+    participant im as iCON-metrics
+    participant p as prometheus
+    loop forever
+        im->>+it : login
+        it->>-im : login success
+        loop until logged out
+            im->>+it : read values
+            it->>-im : thermostat values
+            p->>+im : read metrics
+            im->>-p : thermostat values
+        end
+    end
+```
+
 ### Prometheus scraper
 
 Metrics are hosted in [prometheus](https://prometheus.io/) format.
