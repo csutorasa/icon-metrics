@@ -27,19 +27,13 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "9.2.4"
+      "version": "9.3.6"
     },
     {
       "type": "datasource",
       "id": "prometheus",
       "name": "Prometheus",
       "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
     },
     {
       "type": "panel",
@@ -79,6 +73,19 @@
   "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Room",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -88,6 +95,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 1,
           "mappings": [],
           "max": 28,
           "min": 16,
@@ -116,7 +124,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 4,
       "options": {
@@ -133,7 +141,7 @@
         },
         "showUnfilled": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -160,6 +168,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 0,
           "mappings": [
             {
               "options": {
@@ -197,7 +206,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 1
       },
       "id": 5,
       "options": {
@@ -214,7 +223,7 @@
         },
         "showUnfilled": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -278,7 +287,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 7
       },
       "id": 8,
       "options": {
@@ -293,7 +302,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -353,7 +362,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 7
       },
       "id": 9,
       "options": {
@@ -368,7 +377,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -432,7 +441,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 12
+        "y": 13
       },
       "id": 10,
       "options": {
@@ -447,7 +456,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -469,119 +478,52 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "text": "No"
+                },
+                "1": {
+                  "index": 1,
+                  "text": "Yes"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
               {
                 "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "celsius"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 12,
-        "y": 12
-      },
-      "id": 7,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "9.2.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": true,
-          "expr": "icon_water_temperature{sysId=\"$sysId\"}",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Water temperature",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [],
-          "max": 45,
-          "min": -15,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "semi-dark-blue",
                 "value": null
               },
               {
-                "color": "light-blue",
-                "value": 3
-              },
-              {
-                "color": "light-green",
-                "value": 17
-              },
-              {
-                "color": "#EAB839",
-                "value": 27
-              },
-              {
-                "color": "semi-dark-red",
-                "value": 37
+                "color": "semi-dark-green",
+                "value": 0.5
               }
             ]
-          },
-          "unit": "celsius"
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 20,
-        "y": 12
+        "w": 12,
+        "x": 12,
+        "y": 13
       },
-      "id": 11,
+      "id": 14,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -594,7 +536,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -602,14 +544,27 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "exemplar": true,
-          "expr": "icon_external_temperature{sysId=\"$sysId\"}",
+          "expr": "icon_room_connected{sysId=~\"$sysId\",room=~\"$room\"}",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "{{room}}",
           "refId": "A"
         }
       ],
-      "title": "External temperature",
+      "title": "Room connected",
       "type": "gauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 18,
+      "panels": [],
+      "title": "System",
+      "type": "row"
     },
     {
       "datasource": {
@@ -661,7 +616,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 18
+        "y": 20
       },
       "id": 13,
       "options": {
@@ -676,7 +631,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -698,51 +653,165 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "index": 0,
-                  "text": "No"
-                },
-                "1": {
-                  "index": 1,
-                  "text": "Yes"
-                }
-              },
-              "type": "value"
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
             }
-          ],
-          "max": 1,
-          "min": 0,
+          },
+          "mappings": [],
+          "max": 60,
+          "min": 10,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "#9b9b9b",
                 "value": null
               },
               {
-                "color": "semi-dark-green",
-                "value": 0.5
+                "color": "red",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 16
+              },
+              {
+                "color": "orange",
+                "value": 26
+              },
+              {
+                "color": "red",
+                "value": 40
               }
             ]
-          }
+          },
+          "unit": "celsius"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 6,
-        "w": 12,
+        "w": 8,
         "x": 12,
-        "y": 18
+        "y": 20
       },
-      "id": 14,
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.2.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "icon_water_temperature{sysId=~\"$sysId\"}",
+          "interval": "",
+          "legendFormat": "{{sysId}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Water temperature",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 45,
+          "min": -15,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "semi-dark-blue",
+                "value": null
+              },
+              {
+                "color": "light-blue",
+                "value": 3
+              },
+              {
+                "color": "light-green",
+                "value": 17
+              },
+              {
+                "color": "#EAB839",
+                "value": 27
+              },
+              {
+                "color": "semi-dark-red",
+                "value": 37
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 20,
+        "y": 20
+      },
+      "id": 11,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -755,7 +824,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.4",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -763,13 +832,13 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "exemplar": true,
-          "expr": "icon_room_connected{sysId=~\"$sysId\",room=~\"$room\"}",
+          "expr": "icon_external_temperature{sysId=\"$sysId\"}",
           "interval": "",
-          "legendFormat": "{{room}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "Room connected",
+      "title": "External temperature",
       "type": "gauge"
     },
     {
@@ -819,24 +888,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "semi-dark-blue",
+                "color": "green",
                 "value": null
-              },
-              {
-                "color": "light-blue",
-                "value": 3
-              },
-              {
-                "color": "light-green",
-                "value": 17
-              },
-              {
-                "color": "#EAB839",
-                "value": 27
-              },
-              {
-                "color": "semi-dark-red",
-                "value": 37
               }
             ]
           },
@@ -848,7 +901,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 24
+        "y": 26
       },
       "id": 12,
       "options": {
@@ -870,10 +923,12 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
+          "editorMode": "code",
           "exemplar": true,
           "expr": "increase(icon_http_client_seconds_sum{response!='0',sysId=\"$sysId\"}[2m]) / increase(icon_http_client_seconds_count{response!='0',sysId=\"$sysId\"}[2m])",
           "interval": "",
           "legendFormat": "{{name}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -951,6 +1006,6 @@
   "timezone": "",
   "title": "iCON thermostat",
   "uid": "XolQIeanz",
-  "version": 3,
+  "version": 6,
   "weekStart": ""
 }
