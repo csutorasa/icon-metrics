@@ -47,7 +47,7 @@ func (session *metricsSession) Report(values *model.DataPollResponse, reporter M
 	}
 
 	reporter.ExternalTemperature(session.sysId, values.ExternalTemperature)
-	reporter.WaterTemperature(session.sysId, values.ExternalTemperature)
+	reporter.WaterTemperature(session.sysId, values.WaterTemperature)
 	for id, thermostat := range values.Thermostats {
 		if thermostat.Enabled == 0 {
 			continue

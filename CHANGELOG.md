@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+Bump go version to 1.20
+
 ## 1.2.0
 
 New configuration flags to disable metrics, so disk space can be saved.
