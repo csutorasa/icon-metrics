@@ -1,4 +1,4 @@
-package client
+package model
 
 import (
 	"errors"
@@ -120,20 +120,22 @@ type TPR struct {
 type TPRData struct {
 }
 
+const ActionResultSuccess = "success"
+
 // Action response.
-type actionResponse struct {
+type ActionResponse struct {
 	Result  string         `json:"result"`
 	Refresh bool           `json:"refresh"`
 	Errors  map[string]any `json:"errors"`
 }
 
 // Returns if the action was successful.
-func (response *actionResponse) IsSuccess() bool {
-	return response.Result == "success"
+func (response *ActionResponse) IsSuccess() bool {
+	return response.Result == ActionResultSuccess
 }
 
-// Returns a new error with the content of th errors.
-func (response *actionResponse) CreateError() error {
+// Returns a new error with the content of the errors.
+func (response *ActionResponse) CreateError() error {
 	var sb strings.Builder
 	for error, data := range response.Errors {
 		sb.WriteString(error)

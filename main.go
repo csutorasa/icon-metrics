@@ -27,11 +27,12 @@ func main() {
 		logger.Panicf("Failed to load configuration caused by %s", err.Error())
 	}
 
-	metrics.RegisterUptime()
+	reporter := metrics.NewPrometheusReporter()
+	reporter.Uptime()
 
 	logger.Printf("Starting http server on port %d", c.Port)
 	start := metrics.NewTimer()
-	p := NewPrometherusPublisher(c.Port)
+	p := metrics.NewPrometheusPublisher(c.Port)
 
 	err = p.Start()
 	if err != nil {
@@ -48,7 +49,7 @@ func main() {
 	var wg sync.WaitGroup
 	channels := make([]chan int, 0)
 	for _, device := range c.Devices {
-		client, err := client.NewIconClient(device.Url, device.SysId, device.Password)
+		client, err := client.NewIconClient(device.Url, device.SysId, device.Password, reporter)
 		if err != nil {
 			logger.Printf("Failed to create client for device %s @ %s", device.SysId, device.Url)
 			continue
@@ -64,14 +65,14 @@ func main() {
 				start := metrics.NewTimer()
 				logger.Printf("Disonnecting from %s", client.SysId())
 				err := client.Close()
-				metrics.ConntectedGauge.DeleteLabelValues(client.SysId())
+				reporter.RemoveDevice(client.SysId())
 				if err != nil {
 					logger.Printf("Failed to disonnect from %s caused by %s", client.SysId(), err.Error())
 				} else {
 					logger.Printf("Successfully disconnected from %s under %s", client.SysId(), start.End().String())
 				}
 			}()
-			reportValues(client, reportConfig, ch, delay)
+			reportValues(client, reportConfig, ch, delay, reporter)
 		}()
 	}
 	if len(channels) != 0 {
@@ -137,17 +138,17 @@ func interruptHandler(channels []chan int) {
 }
 
 // Main loop for handling a single iCON device.
-func reportValues(c *client.IconClient, reportConfig *config.ReportConfiguration, trigger chan int, d time.Duration) {
-	session := client.NewSession(c.SysId(), reportConfig)
-	metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(0)
+func reportValues(c client.IconClient, reportConfig *config.ReportConfiguration, trigger chan int, d time.Duration, reporter metrics.MetricsReporter) {
+	session := metrics.NewSession(c.SysId(), reportConfig)
+	reporter.Connected(c.SysId(), false)
 	for {
 		if !c.IsLoggedIn() {
 			logger.Printf("Connecting to %s", c.SysId())
 			err := c.Login()
 			if err != nil {
 				logger.Printf("Failed to connect to %s caused by %s", c.SysId(), err.Error())
-				metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(0)
-				session.Reset()
+				reporter.Connected(c.SysId(), false)
+				session.Reset(reporter)
 				value := sleep(trigger, d)
 				if value > 0 {
 					break
@@ -155,20 +156,20 @@ func reportValues(c *client.IconClient, reportConfig *config.ReportConfiguration
 				continue
 			}
 			logger.Printf("Connected to %s", c.SysId())
-			metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(1)
+			reporter.Connected(c.SysId(), true)
 		}
 		values, err := c.ReadValues()
 		if err != nil {
 			logger.Printf("Failed to read values from %s caused by %s", c.SysId(), err.Error())
-			metrics.ConntectedGauge.WithLabelValues(c.SysId()).Set(0)
-			session.Reset()
+			reporter.Connected(c.SysId(), false)
+			session.Reset(reporter)
 			value := sleep(trigger, d)
 			if value > 0 {
 				break
 			}
 			continue
 		}
-		session.Report(values)
+		session.Report(values, reporter)
 		value := sleep(trigger, d)
 		if value > 0 {
 			break

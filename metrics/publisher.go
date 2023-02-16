@@ -1,8 +1,9 @@
-package main
+package metrics
 
 import (
 	"context"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -11,13 +12,22 @@ import (
 )
 
 // HTTP server
-type Publisher struct {
+type PrometheusPublisher interface {
+	io.Closer
+	// Starts to listen and serve.
+	Start() error
+	// Stops serving and listening.
+	Stop(context context.Context) error
+}
+
+// HTTP server
+type prometheusPublisher struct {
 	server *http.Server
 }
 
 // Creates a new server with the given port
-func NewPrometherusPublisher(port int) *Publisher {
-	publisher := &Publisher{}
+func NewPrometheusPublisher(port int) PrometheusPublisher {
+	publisher := &prometheusPublisher{}
 	publisher.server = &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
 		Handler:        publisher,
@@ -29,7 +39,7 @@ func NewPrometherusPublisher(port int) *Publisher {
 }
 
 // Main logic of the server.
-func (publisher *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (publisher *prometheusPublisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/metrics" {
 		if r.Method == http.MethodGet {
 			promhttp.Handler().ServeHTTP(w, r)
@@ -49,7 +59,7 @@ func (publisher *Publisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Starts to listen and serve.
-func (publisher *Publisher) Start() error {
+func (publisher *prometheusPublisher) Start() error {
 	ln, err := net.Listen("tcp", publisher.server.Addr)
 	if err != nil {
 		return err
@@ -61,11 +71,11 @@ func (publisher *Publisher) Start() error {
 }
 
 // Stops serving and listening.
-func (publisher *Publisher) Stop(context context.Context) error {
+func (publisher *prometheusPublisher) Stop(context context.Context) error {
 	return publisher.server.Shutdown(context)
 }
 
 // Cleans up resources.
-func (publisher *Publisher) Close() error {
+func (publisher *prometheusPublisher) Close() error {
 	return publisher.server.Close()
 }
