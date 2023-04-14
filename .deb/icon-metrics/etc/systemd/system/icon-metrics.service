@@ -1,0 +1,11 @@
+[Unit]
+Description=iCON metrics publisher
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/icon-metrics --config /etc/icon-metrics/config.yml
+WorkingDirectory=/usr/local/bin/
+Restart=always
