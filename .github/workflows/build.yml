@@ -53,7 +53,7 @@ jobs:
           GOARCH: amd64
 
       - name: Create deb
-        run: bash .deb/build.sh amd64
+        run: .deb/build.sh amd64
       
       - name: Create package
         uses: actions/upload-artifact@v3
@@ -70,7 +70,7 @@ jobs:
           GOARCH: arm64
 
       - name: Create deb
-        run: bash .deb/build.sh arm64
+        run: .deb/build.sh arm64
       
       - name: Create package
         uses: actions/upload-artifact@v3
