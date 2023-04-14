@@ -23,7 +23,7 @@ jobs:
           GOOS: windows
           GOARCH: amd64
       
-      - name: Create package
+      - name: Upload output
         uses: actions/upload-artifact@v3
         with:
           name: icon-metrics-windows-amd64
@@ -55,7 +55,13 @@ jobs:
       - name: Create deb
         run: .deb/build.sh amd64
       
-      - name: Create package
+      - name: Upload deb
+        uses: actions/upload-artifact@v3
+        with:
+          name: icon-metrics-deb-amd64
+          path: .deb/icon-metrics.deb
+      
+      - name: Upload output
         uses: actions/upload-artifact@v3
         with:
           name: icon-metrics-linux-amd64
@@ -72,7 +78,13 @@ jobs:
       - name: Create deb
         run: .deb/build.sh arm64
       
-      - name: Create package
+      - name: Upload deb
+        uses: actions/upload-artifact@v3
+        with:
+          name: icon-metrics-deb-arm64
+          path: .deb/icon-metrics.deb
+      
+      - name: Upload output
         uses: actions/upload-artifact@v3
         with:
           name: icon-metrics-linux-arm64
@@ -98,7 +110,7 @@ jobs:
           GOOS: darwin
           GOARCH: amd64
       
-      - name: Create package
+      - name: Upload output
         uses: actions/upload-artifact@v3
         with:
           name: icon-metrics-darwin-amd64
@@ -112,7 +124,7 @@ jobs:
           GOOS: darwin
           GOARCH: arm64
       
-      - name: Create package
+      - name: Upload output
         uses: actions/upload-artifact@v3
         with:
           name: icon-metrics-darwin-arm64
