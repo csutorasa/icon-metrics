@@ -1,8 +1,10 @@
-Package: icon-metrics
-Version: 1.2.0
+Source: icon-metrics
 Section: utils
 Priority: optional
-Architecture: all
 Maintainer: Ármin Csutorás <csutorasa@gmail.com>
-Description: NGBS iCON smart home control system metrics reader
+Package: icon-metrics
+Version: 1.2.0
+Architecture: all
+Description: icon-metrics
+    NGBS iCON smart home control system metrics reader
 Build-Depends: dh-systemd (>=1.5)

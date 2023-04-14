@@ -1,1 +1,2 @@
 /etc/icon-metrics/config.yml
+/etc/systemd/system/icon-metrics.service
