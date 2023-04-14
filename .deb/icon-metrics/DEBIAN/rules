@@ -1,5 +1,9 @@
+#!/usr/bin/make -f
+
+PKGDIR=debian/tmp
+
 %:
-        dh $@
+        dh $@ --with systemd
 
 override_dh_installsystemd:
-        dh_installsystemd --name=icon-metrics icon-metrics.service
+        dh_installsystemd --name=icon-metrics --restart-after-upgrade icon-metrics.service
