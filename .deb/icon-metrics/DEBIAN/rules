@@ -1,0 +1,5 @@
+%:
+        dh $@
+
+override_dh_installsystemd:
+        dh_installsystemd --name=icon-metrics icon-metrics.service
