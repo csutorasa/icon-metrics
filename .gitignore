@@ -1,6 +1,6 @@
 # Output
-icon-metrics
-icon-metrics.exe
+/icon-metrics
+/icon-metrics.exe
 
 # IDE
 .vscode/*

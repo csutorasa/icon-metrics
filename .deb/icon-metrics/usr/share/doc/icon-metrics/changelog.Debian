@@ -1,0 +1,32 @@
+icon-metrics (1.2.0) stable; urgency=low
+
+  New configuration flags to disable metrics, so disk space can be saved.
+  New metric added `icon_room_connected`.
+
+ -- Ármin Csutorás <csutorasa@gmail.com>  Sat, 23 Apr 2022 12:00:00 +0000
+
+icon-metrics (1.1.1) stable; urgency=low
+
+  Stripping executables, removes all debug information to reduce executable size.
+
+ -- Ármin Csutorás <csutorasa@gmail.com>  Tue, 5 Apr 2022 12:00:00 +0000
+
+icon-metrics (1.1.0) stable; urgency=low
+
+  Bump go version to 1.18
+  Remove limit of 8kb for response data
+  Update thermostat ignore filter with to check both Live and Enabled thermostats
+
+ -- Ármin Csutorás <csutorasa@gmail.com>  Tue, 5 Apr 2022 12:00:00 +0000
+
+icon-metrics (1.0.1) stable; urgency=low
+
+  Fail faster in case of server is down
+
+ -- Ármin Csutorás <csutorasa@gmail.com>  Wed, 13 Oct 2021 12:00:00 +0000
+
+icon-metrics (1.0.0) stable; urgency=low
+
+  Initial release
+
+ -- Ármin Csutorás <csutorasa@gmail.com>  Wed, 11 Jul 2021 12:00:00 +0000

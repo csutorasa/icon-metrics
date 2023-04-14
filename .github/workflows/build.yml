@@ -43,11 +43,17 @@ jobs:
         with:
           go-version: '1.20'
 
+      - name: Prepare deb
+        run: .deb/prepare.sh
+
       - name: Build
         run: go build -ldflags "-s -w"
         env:
           GOOS: linux
           GOARCH: amd64
+
+      - name: Create deb
+        run: .deb/build.sh amd64
       
       - name: Create package
         uses: actions/upload-artifact@v3
@@ -62,6 +68,9 @@ jobs:
         env:
           GOOS: linux
           GOARCH: arm64
+
+      - name: Create deb
+        run: .deb/build.sh arm64
       
       - name: Create package
         uses: actions/upload-artifact@v3
