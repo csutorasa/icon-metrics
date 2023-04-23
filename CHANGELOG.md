@@ -3,6 +3,7 @@
 ## Upcoming
 
 Bump go version to 1.20
+Proper handling of OPTION requests and HTTP 405 responses.
 
 ## 1.2.0
 

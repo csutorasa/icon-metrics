@@ -43,14 +43,22 @@ func (publisher *prometheusPublisher) ServeHTTP(w http.ResponseWriter, r *http.R
 	if r.URL.Path == "/metrics" {
 		if r.Method == http.MethodGet {
 			promhttp.Handler().ServeHTTP(w, r)
+		} else if r.Method == http.MethodOptions {
+			w.Header().Add("Allow", "GET")
+			w.WriteHeader(http.StatusNoContent)
 		} else {
+			w.Header().Add("Allow", "GET")
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	} else if r.URL.Path == "/status" {
 		if r.Method == http.MethodGet {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("OK"))
+		} else if r.Method == http.MethodOptions {
+			w.Header().Add("Allow", "GET")
+			w.WriteHeader(http.StatusNoContent)
 		} else {
+			w.Header().Add("Allow", "GET")
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	} else {
