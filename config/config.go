@@ -82,7 +82,7 @@ func validateConfig(config *Configuration) error {
 			device.Password = device.SysId
 		}
 		if device.Delay == 0 {
-			device.Delay = 60
+			device.Delay = 15
 		}
 		if device.Report == nil {
 			defaultReport := ReportConfiguration{

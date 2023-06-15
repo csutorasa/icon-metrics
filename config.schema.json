@@ -37,7 +37,7 @@
             "description": "Delay between scrape calls",
             "minimum": 1,
             "maximum": 3600,
-            "default": 60
+            "default": 15
           },
           "report": {
             "type": "object",

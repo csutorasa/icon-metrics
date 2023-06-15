@@ -3,7 +3,7 @@ devices: []
 #  - url: http://192.168.1.10 # device address
 #    sysid: '123123123123' # device ID (printed on the controller)
 #    password: '123123123123' # password (same as sysid if empty)
-#    delay: 60 # delay in seconds between reads
+#    delay: 15 # delay in seconds between reads
 #    report: # reported metrics configuration
 #      roomConnected: true # if icon_room_connected metric is reported
 #      httpClient: true # if icon_http_client_seconds metric is reported
