@@ -2,8 +2,11 @@
 
 ## Upcoming
 
-Bump go version to 1.20
+## 1.2.1
+
+Bump go version to 1.20.
 Proper handling of OPTION requests and HTTP 405 responses.
+Default delay is set to 15 seconds and is now fixed to default correctly.
 
 ## 1.2.0
 
