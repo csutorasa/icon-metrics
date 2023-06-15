@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -48,7 +48,7 @@ type ReportConfiguration struct {
 // Returns the config that is read from the file.
 func ReadConfig(filepath string) (*Configuration, error) {
 	config := &Configuration{}
-	data, err := ioutil.ReadFile(filepath)
+	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return config, err
 	}
@@ -80,6 +80,9 @@ func validateConfig(config *Configuration) error {
 		}
 		if device.Password == "" {
 			device.Password = device.SysId
+		}
+		if device.Delay == 0 {
+			device.Delay = 60
 		}
 		if device.Report == nil {
 			defaultReport := ReportConfiguration{
