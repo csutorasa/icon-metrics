@@ -1,3 +1,11 @@
+icon-metrics (1.2.1) stable; urgency=low
+
+  Bump go version to 1.20.
+  Proper handling of OPTION requests and HTTP 405 responses.
+  Default delay is set to 15 seconds and is now fixed to default correctly.
+
+ -- Ármin Csutorás <csutorasa@gmail.com>  Sat, 15 Jun 2023 12:00:00 +0000
+
 icon-metrics (1.2.0) stable; urgency=low
 
   New configuration flags to disable metrics, so disk space can be saved.
