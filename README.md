@@ -15,7 +15,7 @@ devices:
   - url: http://192.168.1.10 # device address
     sysid: '123123123123' # device ID (printed on the controller)
     password: '123123123123' # password (defaults to sysid if empty)
-    delay: 15 # delay in seconds between reads (defaults to 60)
+    delay: 60 # delay in seconds between reads (defaults to 15)
   - url: http://192.168.1.11 # device address
     sysid: '321321321321' # device ID (printed on the controller)
 ```
