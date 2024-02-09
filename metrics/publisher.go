@@ -28,52 +28,21 @@ type prometheusPublisher struct {
 // Creates a new server with the given port
 func NewPrometheusPublisher(port int) PrometheusPublisher {
 	publisher := &prometheusPublisher{}
+	promhttpHandler := promhttp.Handler()
+	mux := http.NewServeMux()
+	mux.Handle("GET /metrics", promhttpHandler)
+	mux.HandleFunc("GET /status", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 	publisher.server = &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
-		Handler:        publisher,
+		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 	return publisher
-}
-
-// Main logic of the server.
-func (publisher *prometheusPublisher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/metrics" {
-		ServeMetrics(w, r)
-	} else if r.URL.Path == "/status" {
-		ServeStatus(w, r)
-	} else {
-		w.WriteHeader(http.StatusNotFound)
-	}
-}
-
-// Serves the /metrics API
-func ServeMetrics(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		promhttp.Handler().ServeHTTP(w, r)
-	} else if r.Method == http.MethodOptions {
-		w.Header().Add("Allow", "GET")
-		w.WriteHeader(http.StatusNoContent)
-	} else {
-		w.Header().Add("Allow", "GET")
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
-}
-
-// Serves the /status API
-func ServeStatus(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
-	} else if r.Method == http.MethodOptions {
-		w.Header().Add("Allow", "GET")
-		w.WriteHeader(http.StatusNoContent)
-	} else {
-		w.Header().Add("Allow", "GET")
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
 }
 
 // Starts to listen and serve.

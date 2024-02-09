@@ -50,15 +50,15 @@ func ReadConfig(filepath string) (*Configuration, error) {
 	config := &Configuration{}
 	data, err := os.ReadFile(filepath)
 	if err != nil {
-		return config, err
+		return config, fmt.Errorf("failed to read config: %w", err)
 	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		return config, err
+		return config, fmt.Errorf("failed to parse yaml: %w", err)
 	}
 	err = validateConfig(config)
 	if err != nil {
-		return config, err
+		return config, fmt.Errorf("invalid config: %w", err)
 	}
 	return config, nil
 }

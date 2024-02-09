@@ -3,6 +3,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -97,7 +98,7 @@ func readConfig(configPath string) (*config.Configuration, error) {
 	logger.Printf("Loading configuration from %s", configPath)
 	c, err := config.ReadConfig(configPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read config: %w", err)
 	}
 	logger.Printf("Configuration is loaded from %s", configPath)
 	return c, nil
@@ -105,7 +106,7 @@ func readConfig(configPath string) (*config.Configuration, error) {
 
 // Handles OS signals for shutdown.
 func interruptHandler(channels []chan int) {
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGABRT)
 	closing := false
 	go func() {

@@ -137,8 +137,8 @@ func (response *ActionResponse) IsSuccess() bool {
 // Returns a new error with the content of the errors.
 func (response *ActionResponse) CreateError() error {
 	var sb strings.Builder
-	for error, data := range response.Errors {
-		sb.WriteString(error)
+	for err, data := range response.Errors {
+		sb.WriteString(err)
 		sb.WriteString(" ")
 		sb.WriteString(fmt.Sprintf("%v", data))
 	}

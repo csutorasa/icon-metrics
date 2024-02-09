@@ -75,7 +75,7 @@ func (client *iconHttpClient) SysId() string {
 func (client *iconHttpClient) getPath(p string) (*url.URL, error) {
 	u, err := url.Parse(client.url.String())
 	if err != nil {
-		return nil, fmt.Errorf("failed to creat url from %s %w", client.url.String(), err)
+		return nil, fmt.Errorf("failed to create url from %s: %w", client.url.String(), err)
 	}
 	u.Path = path.Join(u.Path, p)
 	return u, nil
@@ -102,7 +102,7 @@ func unmarshalBody(res *http.Response, v any) error {
 	return nil
 }
 
-// Unpdates session data from cookies.
+// Updates session data from cookies.
 func (client *iconHttpClient) updateCookie(cookies []*http.Cookie) bool {
 	for _, cookie := range cookies {
 		if cookie.Name == phpSessionId {
@@ -137,13 +137,13 @@ func (client *iconHttpClient) Login() error {
 	req, err := http.NewRequest(http.MethodPost, client.url.String(), strings.NewReader(formData.Encode()))
 	if err != nil {
 		client.reporter.HttpClientRequest(client.sysId, "login", 0, timer.End())
-		return err
+		return fmt.Errorf("failed to create request: %s", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
 		client.reporter.HttpClientRequest(client.sysId, "login", 0, timer.End())
-		return err
+		return fmt.Errorf("failed to execute http call: %w", err)
 	}
 	defer res.Body.Close()
 	client.reporter.HttpClientRequest(client.sysId, "login", res.StatusCode, timer.End())
@@ -157,7 +157,7 @@ func (client *iconHttpClient) Login() error {
 	err = unmarshalBody(res, &data)
 	if err != nil {
 		client.removeSession()
-		return err
+		return fmt.Errorf("failed to parse json: %w", err)
 	}
 	if !data.IsSuccess() {
 		client.removeSession()
@@ -180,14 +180,14 @@ func (client *iconHttpClient) Logout() error {
 	req, err := http.NewRequest("POST", url.String(), strings.NewReader(fomrData.Encode()))
 	if err != nil {
 		client.reporter.HttpClientRequest(client.sysId, "logout", 0, timer.End())
-		return err
+		return fmt.Errorf("failed to create request: %s", err)
 	}
 	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: client.sessionId})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
 		client.reporter.HttpClientRequest(client.sysId, "logout", 0, timer.End())
-		return err
+		return fmt.Errorf("failed to execute http call: %w", err)
 	}
 	defer res.Body.Close()
 	client.reporter.HttpClientRequest(client.sysId, "logout", res.StatusCode, timer.End())
@@ -229,7 +229,7 @@ func (client *iconHttpClient) ReadValues() (*model.DataPollResponse, error) {
 	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(fomrData.Encode()))
 	if err != nil {
 		client.reporter.HttpClientRequest(client.sysId, "read_values", 0, timer.End())
-		return nil, err
+		return nil, fmt.Errorf("failed to create request: %s", err)
 	}
 	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: client.sessionId})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -237,7 +237,7 @@ func (client *iconHttpClient) ReadValues() (*model.DataPollResponse, error) {
 	if err != nil {
 		client.reporter.HttpClientRequest(client.sysId, "read_values", 0, timer.End())
 		client.removeSession()
-		return nil, err
+		return nil, fmt.Errorf("failed to execute http call: %w", err)
 	}
 	defer res.Body.Close()
 	client.reporter.HttpClientRequest(client.sysId, "read_values", res.StatusCode, timer.End())
@@ -250,7 +250,7 @@ func (client *iconHttpClient) ReadValues() (*model.DataPollResponse, error) {
 	err = unmarshalBody(res, &data)
 	if err != nil {
 		client.removeSession()
-		return data, err
+		return data, fmt.Errorf("failed to parse json: %w", err)
 	}
 	return data, nil
 }

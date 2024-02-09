@@ -2,6 +2,8 @@
 
 ## Upcoming
 
+Bump go version to 1.22.
+
 ## 1.2.1
 
 Bump go version to 1.20.
