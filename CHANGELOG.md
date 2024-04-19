@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming
+## 1.2.2
 
 Bump go version to 1.22.
 
