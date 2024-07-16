@@ -1,16 +1,22 @@
 package metrics
 
 import (
+	"time"
+
 	"github.com/csutorasa/icon-metrics/config"
 	"github.com/csutorasa/icon-metrics/model"
 )
 
 // Metrics session data holder.
 type MetricsSession interface {
+	// Reports connected metric.
+	Connected(connected bool)
 	// Reports metrics based on device data.
-	Report(values *model.DataPollResponse, reporter MetricsReporter)
+	Report(values *model.DataPollResponse)
+	// Reports HTTP metrics.
+	HttpClientRequest(endpointName string, statusCode int, duration time.Duration)
 	// Resets all metrics.
-	Reset(reporter MetricsReporter)
+	Reset()
 }
 
 // Room data holder.
@@ -24,19 +30,28 @@ type metricsSession struct {
 	sysId               string
 	roomDescriptors     []roomDescriptor
 	reportConfiguration *config.ReportConfiguration
+	reporter            MetricsReporter
 }
 
 // Creates a new session to report metrics.
-func NewSession(sysId string, reportConfiguration *config.ReportConfiguration) MetricsSession {
+func NewSession(sysId string, reportConfiguration *config.ReportConfiguration, reporter MetricsReporter) MetricsSession {
 	return &metricsSession{
 		sysId:               sysId,
 		roomDescriptors:     make([]roomDescriptor, 0),
 		reportConfiguration: reportConfiguration,
+		reporter:            reporter,
+	}
+}
+
+// Reports connected metric.
+func (session *metricsSession) Connected(connected bool) {
+	if *session.reportConfiguration.ControllerConnected {
+		session.reporter.Connected(session.sysId, connected)
 	}
 }
 
 // Reports metrics based on device data.
-func (session *metricsSession) Report(values *model.DataPollResponse, reporter MetricsReporter) {
+func (session *metricsSession) Report(values *model.DataPollResponse) {
 	if len(session.roomDescriptors) == 0 {
 		for id, thermostat := range values.Thermostats {
 			if thermostat.Enabled == 0 {
@@ -46,48 +61,65 @@ func (session *metricsSession) Report(values *model.DataPollResponse, reporter M
 		}
 	}
 
-	reporter.ExternalTemperature(session.sysId, values.ExternalTemperature)
-	reporter.WaterTemperature(session.sysId, values.WaterTemperature)
+	if *session.reportConfiguration.ExternalTemperature {
+		session.reporter.ExternalTemperature(session.sysId, values.ExternalTemperature)
+	}
+	if *session.reportConfiguration.WaterTemperature {
+		session.reporter.WaterTemperature(session.sysId, values.WaterTemperature)
+	}
+	if *session.reportConfiguration.Heating {
+		session.reporter.Heating(session.sysId, values.HeatingCooling == model.Heating)
+	}
+	if *session.reportConfiguration.Eco {
+		session.reporter.Eco(session.sysId, values.ComfortEco == model.Eco)
+	}
 	for id, thermostat := range values.Thermostats {
 		if thermostat.Enabled == 0 {
 			continue
 		}
 		if thermostat.Live == 0 {
-			reporter.RemoveRoom(session.sysId, id, thermostat.Name)
-			reporter.RoomConnected(session.sysId, id, thermostat.Name, false)
+			session.reporter.RemoveRoom(session.sysId, id, thermostat.Name)
+			session.reporter.RoomConnected(session.sysId, id, thermostat.Name, false)
 			continue
 		}
 		if *session.reportConfiguration.RoomConnected {
-			reporter.RoomConnected(session.sysId, id, thermostat.Name, true)
+			session.reporter.RoomConnected(session.sysId, id, thermostat.Name, true)
 		}
 		if *session.reportConfiguration.Temperature {
-			reporter.RoomTemperature(session.sysId, id, thermostat.Name, thermostat.Temperature)
+			session.reporter.RoomTemperature(session.sysId, id, thermostat.Name, thermostat.Temperature)
 		}
 		if *session.reportConfiguration.DewTemperature {
-			reporter.RoomDewTemperature(session.sysId, id, thermostat.Name, thermostat.DewTemperature)
+			session.reporter.RoomDewTemperature(session.sysId, id, thermostat.Name, thermostat.DewTemperature)
 		}
 		if *session.reportConfiguration.Relay {
 			relay := false
 			if thermostat.Relay > 0 {
 				relay = true
 			}
-			reporter.RoomRelay(session.sysId, id, thermostat.Name, relay)
+			session.reporter.RoomRelay(session.sysId, id, thermostat.Name, relay)
 		}
 		if *session.reportConfiguration.Humidity {
-			reporter.RoomHumidity(session.sysId, id, thermostat.Name, thermostat.RelativeHumidity)
+			session.reporter.RoomHumidity(session.sysId, id, thermostat.Name, thermostat.RelativeHumidity)
 		}
 		if *session.reportConfiguration.TargetTemperature {
-			reporter.RoomTargetTemperature(session.sysId, id, thermostat.Name, thermostat.TargetTemperature())
+			session.reporter.RoomTargetTemperature(session.sysId, id, thermostat.Name, thermostat.TargetTemperature())
 		}
 	}
 }
 
-// Resets all metrics.
-func (session *metricsSession) Reset(reporter MetricsReporter) {
-	for _, roomDescriptor := range session.roomDescriptors {
-		reporter.RemoveRoom(session.sysId, roomDescriptor.Id, roomDescriptor.Name)
+// Reports HTTP metrics.
+func (session *metricsSession) HttpClientRequest(endpointName string, statusCode int, duration time.Duration) {
+	if *session.reportConfiguration.HttpClient {
+		session.reporter.HttpClientRequest(session.sysId, endpointName, statusCode, duration)
 	}
-	reporter.RemoveDevice(session.sysId)
-	reporter.Connected(session.sysId, false)
+}
+
+// Resets all metrics.
+func (session *metricsSession) Reset() {
+	for _, roomDescriptor := range session.roomDescriptors {
+		session.reporter.RemoveRoom(session.sysId, roomDescriptor.Id, roomDescriptor.Name)
+	}
+	session.reporter.RemoveDevice(session.sysId)
+	session.reporter.Connected(session.sysId, false)
 	session.roomDescriptors = make([]roomDescriptor, 0)
 }

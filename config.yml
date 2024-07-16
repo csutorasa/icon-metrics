@@ -5,10 +5,13 @@ devices: []
 #    password: '123123123123' # password (same as sysid if empty)
 #    delay: 15 # delay in seconds between reads
 #    report: # reported metrics configuration
-#      roomConnected: true # if icon_room_connected metric is reported
+#      controllerConnected: true # if icon_controller_connected metric is reported
 #      httpClient: true # if icon_http_client_seconds metric is reported
 #      externalTemperature: true # if icon_external_temperature metric is reported
 #      waterTemperature: true # if icon_water_temperature metric is reported
+#      heating: true # if icon_heating metric is reported
+#      eco: true # if icon_eco metric is reported
+#      roomConnected: true # if icon_room_connected metric is reported
 #      temperature: true # if icon_temperature metric is reported
 #      relay: true # if icon_relay_on metric is reported
 #      humidity: true # if icon_humidity metric is reported

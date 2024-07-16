@@ -32,7 +32,7 @@ type iconHttpClient struct {
 	sysId     string
 	password  string
 	sessionId string
-	reporter  metrics.MetricsReporter
+	session   metrics.MetricsSession
 }
 
 // session cookie name
@@ -44,7 +44,7 @@ const phpSessionId = "PHPSESSID"
 const maxReadBytes = 1024 * 1024
 
 // Creates a new client to fetch data from an iCON device.
-func NewIconClient(urlStr string, sysId string, password string, reporter metrics.MetricsReporter) (IconClient, error) {
+func NewIconClient(urlStr string, sysId string, password string, session metrics.MetricsSession) (IconClient, error) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func NewIconClient(urlStr string, sysId string, password string, reporter metric
 		sysId:     sysId,
 		password:  password,
 		sessionId: "",
-		reporter:  reporter,
+		session:   session,
 	}, nil
 }
 
@@ -136,17 +136,17 @@ func (client *iconHttpClient) Login() error {
 	}
 	req, err := http.NewRequest(http.MethodPost, client.url.String(), strings.NewReader(formData.Encode()))
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "login", 0, timer.End())
+		client.session.HttpClientRequest("login", 0, timer.End())
 		return fmt.Errorf("failed to create request: %s", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "login", 0, timer.End())
+		client.session.HttpClientRequest("login", 0, timer.End())
 		return fmt.Errorf("failed to execute http call: %w", err)
 	}
 	defer res.Body.Close()
-	client.reporter.HttpClientRequest(client.sysId, "login", res.StatusCode, timer.End())
+	client.session.HttpClientRequest("login", res.StatusCode, timer.End())
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to login, status code %d", res.StatusCode)
 	}
@@ -174,23 +174,23 @@ func (client *iconHttpClient) Logout() error {
 	}
 	url, err := client.getPath("index.php")
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "logout", 0, timer.End())
+		client.session.HttpClientRequest("logout", 0, timer.End())
 		return err
 	}
 	req, err := http.NewRequest("POST", url.String(), strings.NewReader(fomrData.Encode()))
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "logout", 0, timer.End())
+		client.session.HttpClientRequest("logout", 0, timer.End())
 		return fmt.Errorf("failed to create request: %s", err)
 	}
 	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: client.sessionId})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "logout", 0, timer.End())
+		client.session.HttpClientRequest("logout", 0, timer.End())
 		return fmt.Errorf("failed to execute http call: %w", err)
 	}
 	defer res.Body.Close()
-	client.reporter.HttpClientRequest(client.sysId, "logout", res.StatusCode, timer.End())
+	client.session.HttpClientRequest("logout", res.StatusCode, timer.End())
 	client.removeSession()
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to logout, status code %d", res.StatusCode)
@@ -223,24 +223,24 @@ func (client *iconHttpClient) ReadValues() (*model.DataPollResponse, error) {
 	}
 	url, err := client.getPath("index.php")
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "read_values", 0, timer.End())
+		client.session.HttpClientRequest("read_values", 0, timer.End())
 		return nil, err
 	}
 	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(fomrData.Encode()))
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "read_values", 0, timer.End())
+		client.session.HttpClientRequest("read_values", 0, timer.End())
 		return nil, fmt.Errorf("failed to create request: %s", err)
 	}
 	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: client.sessionId})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "read_values", 0, timer.End())
+		client.session.HttpClientRequest("read_values", 0, timer.End())
 		client.removeSession()
 		return nil, fmt.Errorf("failed to execute http call: %w", err)
 	}
 	defer res.Body.Close()
-	client.reporter.HttpClientRequest(client.sysId, "read_values", res.StatusCode, timer.End())
+	client.session.HttpClientRequest("read_values", res.StatusCode, timer.End())
 	if res.StatusCode != http.StatusOK {
 		client.removeSession()
 		return nil, fmt.Errorf("failed to read data, status code %d", res.StatusCode)
@@ -272,24 +272,24 @@ func (client *iconHttpClient) SetThermostatSettings(tab int, thermosSettings mod
 	formData := getValues(thermosSettings.ToValues(tab))
 	url, err := client.getPath("index.php")
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "set_thermostat_settings", 0, timer.End())
+		client.session.HttpClientRequest("set_thermostat_settings", 0, timer.End())
 		return err
 	}
 	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(formData.Encode()))
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "set_thermostat_settings", 0, timer.End())
+		client.session.HttpClientRequest("set_thermostat_settings", 0, timer.End())
 		return err
 	}
 	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: client.sessionId})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "set_thermostat_settings", 0, timer.End())
+		client.session.HttpClientRequest("set_thermostat_settings", 0, timer.End())
 		client.removeSession()
 		return err
 	}
 	defer res.Body.Close()
-	client.reporter.HttpClientRequest(client.sysId, "set_thermostat_settings", res.StatusCode, timer.End())
+	client.session.HttpClientRequest("set_thermostat_settings", res.StatusCode, timer.End())
 	if res.StatusCode != 200 {
 		client.removeSession()
 		return fmt.Errorf("failed to read data, status code %d", res.StatusCode)
@@ -313,24 +313,24 @@ func (client *iconHttpClient) SetGeneralSettings(tab int, generalSettings *model
 	formData := getValues(generalSettings.ToValues(tab))
 	url, err := client.getPath("index.php")
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "set_general_settings", 0, timer.End())
+		client.session.HttpClientRequest("set_general_settings", 0, timer.End())
 		return err
 	}
 	req, err := http.NewRequest("POST", url.String(), strings.NewReader(formData.Encode()))
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "set_general_settings", 0, timer.End())
+		client.session.HttpClientRequest("set_general_settings", 0, timer.End())
 		return err
 	}
 	req.AddCookie(&http.Cookie{Name: phpSessionId, Value: client.sessionId})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	res, err := client.client.Do(req)
 	if err != nil {
-		client.reporter.HttpClientRequest(client.sysId, "set_general_settings", 0, timer.End())
+		client.session.HttpClientRequest("set_general_settings", 0, timer.End())
 		client.removeSession()
 		return err
 	}
 	defer res.Body.Close()
-	client.reporter.HttpClientRequest(client.sysId, "set_general_settings", res.StatusCode, timer.End())
+	client.session.HttpClientRequest("set_general_settings", res.StatusCode, timer.End())
 	if res.StatusCode != http.StatusOK {
 		client.removeSession()
 		return fmt.Errorf("failed to read data, status code %d", res.StatusCode)

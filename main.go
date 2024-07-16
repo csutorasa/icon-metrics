@@ -50,7 +50,9 @@ func main() {
 	var wg sync.WaitGroup
 	channels := make([]chan int, 0)
 	for _, device := range c.Devices {
-		client, err := client.NewIconClient(device.Url, device.SysId, device.Password, reporter)
+		reportConfig := device.Report
+		session := metrics.NewSession(device.SysId, reportConfig, reporter)
+		client, err := client.NewIconClient(device.Url, device.SysId, device.Password, session)
 		if err != nil {
 			logger.Printf("Failed to create client for device %s @ %s", device.SysId, device.Url)
 			continue
@@ -59,7 +61,6 @@ func main() {
 		ch := make(chan int)
 		channels = append(channels, ch)
 		wg.Add(1)
-		reportConfig := device.Report
 		go func() {
 			defer wg.Done()
 			defer func() {
@@ -73,7 +74,7 @@ func main() {
 					logger.Printf("Successfully disconnected from %s under %s", client.SysId(), start.End().String())
 				}
 			}()
-			reportValues(client, reportConfig, ch, delay, reporter)
+			reportValues(client, ch, delay, session)
 		}()
 	}
 	if len(channels) != 0 {
@@ -139,17 +140,15 @@ func interruptHandler(channels []chan int) {
 }
 
 // Main loop for handling a single iCON device.
-func reportValues(c client.IconClient, reportConfig *config.ReportConfiguration, trigger chan int, d time.Duration, reporter metrics.MetricsReporter) {
-	session := metrics.NewSession(c.SysId(), reportConfig)
-	reporter.Connected(c.SysId(), false)
+func reportValues(c client.IconClient, trigger chan int, d time.Duration, session metrics.MetricsSession) {
+	session.Connected(false)
 	for {
 		if !c.IsLoggedIn() {
 			logger.Printf("Connecting to %s", c.SysId())
 			err := c.Login()
 			if err != nil {
 				logger.Printf("Failed to connect to %s caused by %s", c.SysId(), err.Error())
-				reporter.Connected(c.SysId(), false)
-				session.Reset(reporter)
+				session.Reset()
 				value := sleep(trigger, d)
 				if value > 0 {
 					break
@@ -157,20 +156,19 @@ func reportValues(c client.IconClient, reportConfig *config.ReportConfiguration,
 				continue
 			}
 			logger.Printf("Connected to %s", c.SysId())
-			reporter.Connected(c.SysId(), true)
+			session.Connected(true)
 		}
 		values, err := c.ReadValues()
 		if err != nil {
 			logger.Printf("Failed to read values from %s caused by %s", c.SysId(), err.Error())
-			reporter.Connected(c.SysId(), false)
-			session.Reset(reporter)
+			session.Reset()
 			value := sleep(trigger, d)
 			if value > 0 {
 				break
 			}
 			continue
 		}
-		session.Report(values, reporter)
+		session.Report(values)
 		value := sleep(trigger, d)
 		if value > 0 {
 			break

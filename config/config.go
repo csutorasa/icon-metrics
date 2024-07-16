@@ -25,12 +25,18 @@ type IconConfiguration struct {
 
 // iCON device report configuration
 type ReportConfiguration struct {
+	// metrics.RoomConntectedGauge
+	ControllerConnected *bool `yaml:"controllerConnected"`
 	// metrics.HttpGauge
 	HttpClient *bool `yaml:"httpClient"`
 	// metrics.WaterTemperatureGauge
 	WaterTemperature *bool `yaml:"waterTemperature"`
 	// metrics.ExternalTemperatureGauge
 	ExternalTemperature *bool `yaml:"externalTemperature"`
+	// metrics.HeatingGauge
+	Heating *bool `yaml:"heating"`
+	// metrics.EcoGauge
+	Eco *bool `yaml:"eco"`
 	// metrics.RoomConntectedGauge
 	RoomConnected *bool `yaml:"roomConnected"`
 	// metrics.RoomTemperatureGauge
@@ -86,9 +92,12 @@ func validateConfig(config *Configuration) error {
 		}
 		if device.Report == nil {
 			defaultReport := ReportConfiguration{
+				ControllerConnected: enabled(),
 				HttpClient:          enabled(),
 				WaterTemperature:    enabled(),
 				ExternalTemperature: enabled(),
+				Heating:             enabled(),
+				Eco:                 enabled(),
 				RoomConnected:       enabled(),
 				Temperature:         enabled(),
 				DewTemperature:      enabled(),
@@ -98,6 +107,9 @@ func validateConfig(config *Configuration) error {
 			}
 			device.Report = &defaultReport
 		} else {
+			if device.Report.ControllerConnected == nil {
+				device.Report.ControllerConnected = enabled()
+			}
 			if device.Report.HttpClient == nil {
 				device.Report.HttpClient = enabled()
 			}
@@ -106,6 +118,12 @@ func validateConfig(config *Configuration) error {
 			}
 			if device.Report.ExternalTemperature == nil {
 				device.Report.ExternalTemperature = enabled()
+			}
+			if device.Report.Heating == nil {
+				device.Report.Heating = enabled()
+			}
+			if device.Report.Eco == nil {
+				device.Report.Eco = enabled()
 			}
 			if device.Report.RoomConnected == nil {
 				device.Report.RoomConnected = enabled()

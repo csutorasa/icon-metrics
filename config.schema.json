@@ -43,6 +43,11 @@
             "type": "object",
             "description": "Configuration of reported values",
             "properties": {
+              "controllerConnected": {
+                "type": "boolean",
+                "description": "Enables reporting icon_controller_connected",
+                "defaultValue": true
+              },
               "httpClient": {
                 "type": "boolean",
                 "description": "Enables reporting icon_http_client_seconds",
@@ -56,6 +61,16 @@
               "externalTemperature": {
                 "type": "boolean",
                 "description": "Enables reporting icon_external_temperature",
+                "defaultValue": true
+              },
+              "heating": {
+                "type": "boolean",
+                "description": "Enables reporting icon_heating",
+                "defaultValue": true
+              },
+              "eco": {
+                "type": "boolean",
+                "description": "Enables reporting icon_eco",
                 "defaultValue": true
               },
               "roomConnected": {

@@ -36,6 +36,10 @@ type SystemMetricsReporter interface {
 	WaterTemperature(sysId string, temperature float64)
 	// Reports the external temperature.
 	ExternalTemperature(sysId string, temperature float64)
+	// Reports if the controller is set to heating or cooling.
+	Heating(sysId string, heating bool)
+	// Reports if the controller is set to eco or normal mode.
+	Eco(sysId string, eco bool)
 	// Removes device from reporting.
 	RemoveDevice(sysId string)
 }
@@ -44,21 +48,31 @@ type systemMetricsReporter struct {
 	connectedGauge           *prometheus.GaugeVec
 	waterTemperatureGauge    *prometheus.GaugeVec
 	externalTemperatureGauge *prometheus.GaugeVec
+	heatingGauge             *prometheus.GaugeVec
+	ecoGauge                 *prometheus.GaugeVec
 }
 
 func newSystemPrometheusReporter() SystemMetricsReporter {
 	return &systemMetricsReporter{
 		connectedGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_controller_connected",
-			Help: "Reports if controller is connected",
+			Help: "For each controller, reports 1 if the controller is ready to be read, 0 otherwise.",
 		}, genericParameters),
 		waterTemperatureGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_water_temperature",
-			Help: "Water temperature",
+			Help: "For each controller, reports the cooling or heating water temperature",
 		}, genericParameters),
 		externalTemperatureGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_external_temperature",
-			Help: "External temperature",
+			Help: "For each controller, reports external temperature",
+		}, genericParameters),
+		heatingGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
+			Name: "icon_heating",
+			Help: "For each controller, reports 1 if the controller is set to heating mode, 0 otherwise",
+		}, genericParameters),
+		ecoGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
+			Name: "icon_eco",
+			Help: "For each controller, reports 1 if the controller is in economy mode, 0 otherwise",
 		}, genericParameters),
 	}
 }
@@ -80,10 +94,30 @@ func (r *systemMetricsReporter) ExternalTemperature(sysId string, temperature fl
 	r.externalTemperatureGauge.WithLabelValues(sysId).Set(temperature)
 }
 
+func (r *systemMetricsReporter) Heating(sysId string, heating bool) {
+	gauge := r.heatingGauge.WithLabelValues(sysId)
+	if heating {
+		gauge.Set(1)
+	} else {
+		gauge.Set(0)
+	}
+}
+
+func (r *systemMetricsReporter) Eco(sysId string, eco bool) {
+	gauge := r.ecoGauge.WithLabelValues(sysId)
+	if eco {
+		gauge.Set(1)
+	} else {
+		gauge.Set(0)
+	}
+}
+
 func (r *systemMetricsReporter) RemoveDevice(sysId string) {
 	r.connectedGauge.DeleteLabelValues(sysId)
 	r.waterTemperatureGauge.DeleteLabelValues(sysId)
 	r.externalTemperatureGauge.DeleteLabelValues(sysId)
+	r.heatingGauge.DeleteLabelValues(sysId)
+	r.ecoGauge.DeleteLabelValues(sysId)
 }
 
 // Room related required parameters
@@ -119,27 +153,27 @@ func newRoomMetricsReporter() RoomMetricsReporter {
 	return &roomMetricsReporter{
 		roomConntectedGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_room_connected",
-			Help: "Reports if room is connected",
+			Help: "For each room, reports 1 if the room is connected to the controller, 0 otherwise",
 		}, roomParameters),
 		roomTemperatureGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_temperature",
-			Help: "Room temperature",
+			Help: "For each room, reports the room temperature",
 		}, roomParameters),
 		roomDewTemperatureGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_dew_temperature",
-			Help: "Room temperature",
+			Help: "For each room, reports the room dew temperature",
 		}, roomParameters),
 		roomTargetTemperatureGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_target_temperature",
-			Help: "Target temperature",
+			Help: "For each room, reports the target temperature",
 		}, roomParameters),
 		roomHumidityGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_humidity",
-			Help: "Relative humidity",
+			Help: "For each room, reports the relative humidity",
 		}, roomParameters),
 		roomRelayGauge: promauto.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "icon_relay_on",
-			Help: "Relay on flag",
+			Help: "For each room, reports 1 if the relay is open, 0 otherwise",
 		}, roomParameters),
 	}
 }

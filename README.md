@@ -125,19 +125,21 @@ Most metrics can be disabled from the configuaration separately for each device 
 
 Available metrics:
 
-| Metric                    | Type    | Description                                          | Enable configuration flag |
-| ------------------------- | ------- | ---------------------------------------------------- | ------------------------- |
-| uptime                    | gauge   | uptime in milliseconds                               | N/A                       |
-| icon_controller_connected | gauge   | 1 if the controller is ready to be read 0 otherwise  | N/A                       |
-| icon_room_connected       | gauge   | 1 if the room is connected to the device 0 otherwise | roomConnected             |
-| icon_http_client_seconds  | summary | icon HTTP request durations in seconds               | httpClient                |
-| icon_external_temperature | gauge   | external temperature                                 | externalTemperature       |
-| icon_water_temperature    | gauge   | water temperature                                    | waterTemperature          |
-| icon_temperature          | gauge   | room temperature                                     | temperature               |
-| icon_relay_on             | gauge   | 1 if room relay is open 0 otherwise                  | relay                     |
-| icon_humidity             | gauge   | room humidity                                        | humidity                  |
-| icon_target_temperature   | gauge   | room target temperature                              | targetTemperature         |
-| icon_dew_temperature      | gauge   | room dew temperature                                 | dewTemperature            |
+| Metric                    | Scope          | Type    | Description                                               | Enable configuration flag |
+| ------------------------- | -------------- | ------- | --------------------------------------------------------- | ------------------------- |
+| uptime                    | global         | gauge   | uptime in milliseconds                                    | N/A                       |
+| icon_controller_connected | per controller | gauge   | 1 if the controller is ready to be read, 0 otherwise      | controllerConnected       |
+| icon_http_client_seconds  | per controller | summary | icon HTTP request durations in seconds                    | httpClient                |
+| icon_external_temperature | per controller | gauge   | external temperature                                      | externalTemperature       |
+| icon_water_temperature    | per controller | gauge   | cooling or heating water temperature                      | waterTemperature          |
+| icon_heating              | per controller | gauge   | 1 if the controller is set to heating mode, 0 otherwise   | heating                   |
+| icon_eco                  | per controller | gauge   | 1 if the controller is in economy mode, 0 otherwise       | eco                       |
+| icon_room_connected       | per room       | gauge   | 1 if the room is connected to the controller, 0 otherwise | roomConnected             |
+| icon_temperature          | per room       | gauge   | room temperature                                          | temperature               |
+| icon_relay_on             | per room       | gauge   | 1 if the relay is open, 0 otherwise                       | relay                     |
+| icon_humidity             | per room       | gauge   | room humidity                                             | humidity                  |
+| icon_target_temperature   | per room       | gauge   | room target temperature                                   | targetTemperature         |
+| icon_dew_temperature      | per room       | gauge   | room dew temperature                                      | dewTemperature            |
 
 ## Grafana dashboard
 
