@@ -144,6 +144,6 @@ Available metrics:
 ## Grafana dashboard
 
 This data is designed to be displayed in a [grafana dashboard](https://grafana.com/docs/grafana/latest/dashboards/).
-Example dashboards for the [system](grafana-iCON-metrics-system.json) and the [rooms](grafana-iCON-rooms.json) are available to be [imported](https://grafana.com/docs/grafana/latest/dashboards/export-import/).
+Example dashboards for the [system](grafana-iCON-system.json), [controllers](grafana-iCON-controllers.json) and the [rooms](grafana-iCON-rooms.json) are available to be [imported](https://grafana.com/docs/grafana/latest/dashboards/export-import/).
 
 ![grafana_image](https://user-images.githubusercontent.com/6968192/164945271-5c75cd29-55b0-4057-a737-3945aad95413.png)
