@@ -34,6 +34,20 @@ jobs:
             icon-metrics.exe
             config.yml
 
+      - name: Build
+        run: go build -ldflags "-s -w"
+        env:
+          GOOS: windows
+          GOARCH: arm64
+      
+      - name: Upload output
+        uses: actions/upload-artifact@v4
+        with:
+          name: icon-metrics-windows-arm64
+          path: |
+            icon-metrics.exe
+            config.yml
+
   build_linux:
     name: Build linux
     runs-on: ubuntu-latest
