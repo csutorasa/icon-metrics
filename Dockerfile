@@ -1,8 +1,9 @@
-FROM golang:1.22 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22 AS builder
 
 COPY . /app
 WORKDIR /app/
-RUN export CGO_ENABLED=0 && go build -ldflags "-s -w"
+RUN echo $TARGETPLATFORM
+RUN export CGO_ENABLED=0 && export GOARCH=$(echo "$TARGETPLATFORM" | cut -d "/" -f2) && go build -ldflags "-s -w"
 
 FROM alpine:latest
 
