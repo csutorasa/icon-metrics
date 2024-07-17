@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+Fixed `httpClient`, `externalTemperature` and `waterTemperature` configuration flags.
+Added `controllerConnected` configuration flag for `icon_controller_connected`.
+New metrics added for heating/cooling `icon_heating` and comfort/eco `icon_eco`.
+
 ## 1.2.2
 
 Bump go version to 1.22.
