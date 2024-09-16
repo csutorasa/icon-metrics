@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+Bump go version to 1.23.
+
 ## 1.3.0
 
 Fixed `httpClient`, `externalTemperature` and `waterTemperature` configuration flags.
