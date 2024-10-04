@@ -1,0 +1,66 @@
+__icon_metrics_bash_completion() {
+    # Flags from the application
+    local flags=("--config")
+    local cur="${COMP_WORDS[$COMP_CWORD]}"
+    local isflag="$(($COMP_CWORD % 2))"
+    # Flag
+    if [ "$isflag" -eq "1" ]
+    then
+        # flags
+        local remaining=()
+        for flag in "${flags[@]}"
+        do
+            local found=0
+            for arg in "${COMP_WORDS[@]}"
+            do
+                if [ "$(($COMP_CWORD % 2))" -eq 1 ] && [ "$flag" = "$arg" ]
+                then 
+                    found=1
+                    break
+                fi
+            done
+            if [ "$found" -eq "0" ]
+            then
+                remaining+=("$flag")
+            fi
+        done
+        COMPREPLY=($(compgen -W "$(echo "${remaining[@]}")" -- "$cur"))
+        return
+    fi
+    # Flag value
+    if [ "$isflag" -eq "0" ]
+    then
+        # Based on the flag
+        local flag_index=$(($COMP_CWORD - 1))
+        case "${COMP_WORDS[$flag_index]}" in
+            --config)
+                compopt -o nospace
+                if [ "${cur: -1}" = "/" ]
+                then
+                    COMPREPLY=($(compgen -d -S "/" "$cur") $(compgen -W "$(compgen -G "$cur*.yml")" -- "$b") $(compgen -W "$(compgen -G "$cur*.yaml")" -- "$b"))
+                    return
+                fi
+                local d=$(dirname "$cur")
+                local b=$(basename "$cur")
+                if [ "$d" = "." ]
+                then
+                    COMPREPLY=($(compgen -d -S "/" "$cur") $(compgen -W "$(compgen -G "*.yml")" -- "$b") $(compgen -W "$(compgen -G "*.yaml")" -- "$b"))
+                    return
+                else
+                    COMPREPLY=($(compgen -d -S "/" "$cur") $(compgen -W "$(compgen -G "$d/*.yml")" -- "$b") $(compgen -W "$(compgen -G "$d/*.yaml")" -- "$b"))
+                    return
+                fi
+                ;;
+            *)
+                # Unexpected flag
+                COMPREPLY=()
+                return
+            ;;
+        esac
+    fi
+    # Unexpected number of arguments
+    COMPREPLY=()
+    return
+}
+
+complete -F __icon_metrics_bash_completion icon-metrics

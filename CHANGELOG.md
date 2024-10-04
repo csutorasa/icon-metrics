@@ -3,6 +3,7 @@
 ## Next
 
 Bump go version to 1.23.
+New bash-completion is available.
 
 ## 1.3.0
 
