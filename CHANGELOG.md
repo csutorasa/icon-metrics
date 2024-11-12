@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 1.3.1
 
 Bump go version to 1.23.
 New bash-completion is available.
