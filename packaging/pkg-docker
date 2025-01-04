@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+VERSION=$1
+
+# Make sure directory is correct
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $SCRIPT_DIR
+
+docker buildx build --push --tag csutorasa/icon-metrics:latest --tag csutorasa/icon-metrics:$VERSION --platform linux/amd64,linux/arm64 ..
