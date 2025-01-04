@@ -1,0 +1,48 @@
+#!/bin/bash
+
+ARCH=$1
+VERSION=$2
+
+PKGNAME=icon-metrics-$ARCH-$VERSION
+OUTPUT=.temp/$PKGNAME-deb
+
+# Make sure directory is correct
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $SCRIPT_DIR
+
+# Clear output temp directory - ONLY deb
+rm -rf $OUTPUT/
+mkdir -p $OUTPUT/
+
+# Application
+mkdir -p $OUTPUT/usr/local/bin/
+cp ../icon-metrics $OUTPUT/usr/local/bin/icon-metrics
+mkdir -p $OUTPUT/etc/icon-metrics/
+cp ../config.yml $OUTPUT/etc/icon-metrics/config.yml
+
+# Debian
+mkdir -p $OUTPUT/DEBIAN
+cp debian/changelog $OUTPUT/DEBIAN/
+cp debian/conffiles $OUTPUT/DEBIAN/
+cp debian/control $OUTPUT/DEBIAN/
+sed -i "s/Architecture:.*/Architecture: $ARCH/g" $OUTPUT/DEBIAN/control
+
+# Systemd
+mkdir -p $OUTPUT/etc/systemd/system/
+cp systemd/icon-metrics.service $OUTPUT/etc/systemd/system/icon-metrics.service
+
+# Bash completion
+mkdir -p $OUTPUT/usr/share/bash-completion/completions/
+cp bash/bash-completion $OUTPUT/usr/share/bash-completion/completions/icon-metrics
+
+# Documentation
+mkdir -p $OUTPUT/usr/share/doc/icon-metrics/
+cp ../LICENSE $OUTPUT/usr/share/doc/icon-metrics/copyright
+cp debian/changelog $OUTPUT/usr/share/doc/icon-metrics/changelog.Debian
+gzip --best -n -f $OUTPUT/usr/share/doc/icon-metrics/changelog.Debian
+mkdir -p $OUTPUT/usr/share/man/man1/
+cp man/icon-metrics.1 $OUTPUT/usr/share/man/man1/icon-metrics.1
+gzip --best -n -f $OUTPUT/usr/share/man/man1/icon-metrics.1
+
+# Build deb package - ONLY deb
+dpkg-deb --root-owner-group --build $OUTPUT $PKGNAME

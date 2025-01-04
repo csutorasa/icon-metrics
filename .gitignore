@@ -1,6 +1,8 @@
 # Output
 /icon-metrics
 /icon-metrics.exe
+/packaging/.temp
+/packaging/*.deb
 
 # IDE
 .vscode/*
