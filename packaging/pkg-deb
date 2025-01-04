@@ -45,4 +45,4 @@ cp man/icon-metrics.1 $OUTPUT/usr/share/man/man1/icon-metrics.1
 gzip --best -n -f $OUTPUT/usr/share/man/man1/icon-metrics.1
 
 # Build deb package - ONLY deb
-dpkg-deb --root-owner-group --build $OUTPUT $PKGNAME
+dpkg-deb --root-owner-group --build $OUTPUT
