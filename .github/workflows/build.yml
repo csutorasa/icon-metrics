@@ -51,4 +51,4 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         with:
           name: icon-metrics-deb-${{ matrix.arch }}
-          path: packaging/icon-metrics-${{ matrix.arch }}-${{ env.appVersion }}-deb
+          path: packaging/icon-metrics-${{ matrix.arch }}-${{ env.appVersion }}.deb
