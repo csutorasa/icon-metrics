@@ -43,10 +43,12 @@ jobs:
             config.yml
 
       - name: Create deb
+        if: matrix.os == 'ubuntu-latest'
         run: packaging/pkg-deb ${{ matrix.arch }} ${{ env.appVersion }}
       
       - name: Upload deb
         uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
         with:
           name: icon-metrics-deb-${{ matrix.arch }}
           path: packaging/icon-metrics-${{ matrix.arch }}-${{ env.appVersion }}-deb
