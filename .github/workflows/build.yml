@@ -16,10 +16,10 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos, windows, ubuntu]
         arch: [amd64, arm64]
     name: Build ${{ matrix.os }} ${{ matrix.arch }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,19 +37,19 @@ jobs:
       - name: Upload output
         uses: actions/upload-artifact@v4
         with:
-          name: icon-metrics-${{ matrix.os }}-${{ matrix.arch }}
+          name: icon-metrics-${{ matrix.os }}-${{ matrix.arch }}-${{ env.appVersion }}
           path: |
             icon-metrics
             icon-metrics.exe
             config.yml
 
       - name: Create deb
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu'
         run: packaging/pkg-deb ${{ matrix.arch }} ${{ env.appVersion }}
       
       - name: Upload deb
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu'
         with:
           name: icon-metrics-deb-${{ matrix.arch }}
           path: packaging/icon-metrics-${{ matrix.arch }}-${{ env.appVersion }}.deb
