@@ -23,42 +23,15 @@ devices:
 Config.yml validation can be done via the [schema](config.schema.json).
 For further configuration options use the [schema](config.schema.json) to explore and validate your config file.
 
-## Install on linux
+## Build on linux
 
-Download the application from [GitHub releases](https://github.com/csutorasa/icon-metrics/releases) and unzip it.
-
-```bash
-wget https://github.com/csutorasa/icon-metrics/releases/download/1.3.1/icon-metrics-linux-amd64.zip
-unzip icon-metrics-linux-amd64.zip
-```
-
-Create systemd service.
-
-```bash
-touch /etc/systemd/system/icon-metrics.service
-```
-
-```ini
-[Unit]
-Description=iCON metrics publisher
-
-[Install]
-WantedBy=multi-user.target
-
-[Service]
-Type=simple
-ExecStart=/path/to/icon-metrics
-WorkingDirectory=/path/to
-StandardOutput=/var/log/icon-metrics/log.log
-StandardError=/var/log/icon-metrics/error.log
-Restart=always
-```
-
-[Automatic install script](linux_installer.sh)
-
-```bash
-curl -s https://raw.githubusercontent.com/csutorasa/icon-metrics/master/linux_installer.sh | sudo bash -s amd64
-```
+- Install latest version of [go](https://go.dev/).
+- Clone this repository `git clone https://github.com/csutorasa/icon-metrics.git`.
+- Build the applciation `go build`.
+- Depending on the operating system:
+  - Debian or debian based - Run the [deb package builder](packaging/pkg-debian) and install it, `packaging/pkg-deb && dkpg -i packaging/icon-metrics-*.deb`.
+  - Linux - Run the [installer](packaging/pkg-install) `sudo packaging/pkg-install`.
+  - Windows or MacOS - Run or schedule start the application.
 
 ## Docker image
 
