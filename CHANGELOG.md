@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.3
+
+Bump go version to 1.24.
+Bump dependency versions.
+
 ## 1.3.2
 
 Bump dependency versions.

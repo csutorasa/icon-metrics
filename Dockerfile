@@ -1,13 +1,17 @@
-FROM --platform=$BUILDPLATFORM golang:1.23 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24 AS builder
+
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
 COPY . /app
 WORKDIR /app/
-RUN echo $TARGETPLATFORM
-RUN export CGO_ENABLED=0 && export GOARCH=$(echo "$TARGETPLATFORM" | cut -d "/" -f2) && go build -ldflags "-s -w"
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} && go build -ldflags "-s -w"
 
-FROM alpine:latest
+FROM --platform=$TARGETPLATFORM alpine:latest
 
-COPY --from=builder /app/icon-metrics /app/
+COPY --from=builder /app/icon-metrics/ /app/
 WORKDIR /app/
 EXPOSE 8080
 
