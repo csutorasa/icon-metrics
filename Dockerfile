@@ -7,12 +7,13 @@ ARG TARGETARCH
 
 COPY . /app
 WORKDIR /app/
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} && go build -ldflags "-s -w"
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags "-s -w"
 
 FROM --platform=$TARGETPLATFORM alpine:latest
 
-COPY --from=builder /app/icon-metrics/ /app/
+COPY --from=builder /app/icon-metrics /app/
 WORKDIR /app/
 EXPOSE 8080
+RUN ls 
 
 ENTRYPOINT [ "./icon-metrics" ]
