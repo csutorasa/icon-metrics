@@ -1,4 +1,4 @@
-package metrics
+package server
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 // HTTP server
-type PrometheusPublisher interface {
+type IconMetricsServer interface {
 	io.Closer
 	// Starts to listen and serve.
 	Start() error
@@ -21,32 +21,31 @@ type PrometheusPublisher interface {
 }
 
 // HTTP server
-type prometheusPublisher struct {
+type iconMetricsServer struct {
 	server *http.Server
 }
 
 // Creates a new server with the given port
-func NewPrometheusPublisher(port int) PrometheusPublisher {
-	publisher := &prometheusPublisher{}
-	promhttpHandler := promhttp.Handler()
+func NewIconMetricsServer(port int) IconMetricsServer {
+	server := &iconMetricsServer{}
 	mux := http.NewServeMux()
-	mux.Handle("GET /metrics", promhttpHandler)
+	mux.Handle("GET /metrics", promhttp.Handler())
 	mux.HandleFunc("GET /status", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
-	publisher.server = &http.Server{
+	server.server = &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
 		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	return publisher
+	return server
 }
 
 // Starts to listen and serve.
-func (publisher *prometheusPublisher) Start() error {
+func (publisher *iconMetricsServer) Start() error {
 	ln, err := net.Listen("tcp", publisher.server.Addr)
 	if err != nil {
 		return err
@@ -58,11 +57,11 @@ func (publisher *prometheusPublisher) Start() error {
 }
 
 // Stops serving and listening.
-func (publisher *prometheusPublisher) Stop(context context.Context) error {
+func (publisher *iconMetricsServer) Stop(context context.Context) error {
 	return publisher.server.Shutdown(context)
 }
 
 // Cleans up resources.
-func (publisher *prometheusPublisher) Close() error {
+func (publisher *iconMetricsServer) Close() error {
 	return publisher.server.Close()
 }

@@ -3,8 +3,8 @@ package metrics
 import (
 	"time"
 
-	"github.com/csutorasa/icon-metrics/config"
-	"github.com/csutorasa/icon-metrics/model"
+	"github.com/csutorasa/icon-metrics/internal/config"
+	"github.com/csutorasa/icon-metrics/pkg/model"
 )
 
 // Metrics session data holder.

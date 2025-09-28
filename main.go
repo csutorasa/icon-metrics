@@ -12,9 +12,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/csutorasa/icon-metrics/client"
-	"github.com/csutorasa/icon-metrics/config"
-	"github.com/csutorasa/icon-metrics/metrics"
+	"github.com/csutorasa/icon-metrics/internal/config"
+	"github.com/csutorasa/icon-metrics/internal/metrics"
+	"github.com/csutorasa/icon-metrics/internal/server"
+	"github.com/csutorasa/icon-metrics/pkg/client"
 )
 
 // Main logger instance
@@ -33,16 +34,16 @@ func main() {
 
 	logger.Printf("Starting http server on port %d", c.Port)
 	start := metrics.NewTimer()
-	p := metrics.NewPrometheusPublisher(c.Port)
+	s := server.NewIconMetricsServer(c.Port)
 
-	err = p.Start()
+	err = s.Start()
 	if err != nil {
 		logger.Panicf("Failed to start http server on port %d caused by %s", c.Port, err.Error())
 	}
 	defer func() {
 		start := metrics.NewTimer()
 		logger.Printf("Stopping http server on port %d", c.Port)
-		p.Close()
+		s.Close()
 		logger.Printf("Successfully stopped http server on port %d under %s", c.Port, start.End().String())
 	}()
 	logger.Printf("Successfully started http server on port %d under %s", c.Port, start.End().String())
@@ -52,11 +53,12 @@ func main() {
 	for _, device := range c.Devices {
 		reportConfig := device.Report
 		session := metrics.NewSession(device.SysId, reportConfig, reporter)
-		client, err := client.NewIconClient(device.Url, device.SysId, device.Password, session)
+		c, err := client.NewIconClient(device.Url, device.SysId, device.Password)
 		if err != nil {
 			logger.Printf("Failed to create client for device %s @ %s", device.SysId, device.Url)
 			continue
 		}
+		client := metrics.NewIconMetricsClient(c, session)
 		delay := time.Duration(device.Delay) * time.Second
 		ch := make(chan int)
 		channels = append(channels, ch)
@@ -97,7 +99,7 @@ func parseArgs() string {
 // Returns configuration from file.
 func readConfig(configPath string) (*config.Configuration, error) {
 	logger.Printf("Loading configuration from %s", configPath)
-	c, err := config.ReadConfig(configPath)
+	c, err := config.ReadConfigFile(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config: %w", err)
 	}
@@ -143,21 +145,6 @@ func interruptHandler(channels []chan int) {
 func reportValues(c client.IconClient, trigger chan int, d time.Duration, session metrics.MetricsSession) {
 	session.Connected(false)
 	for {
-		if !c.IsLoggedIn() {
-			logger.Printf("Connecting to %s", c.SysId())
-			err := c.Login()
-			if err != nil {
-				logger.Printf("Failed to connect to %s caused by %s", c.SysId(), err.Error())
-				session.Reset()
-				value := sleep(trigger, d)
-				if value > 0 {
-					break
-				}
-				continue
-			}
-			logger.Printf("Connected to %s", c.SysId())
-			session.Connected(true)
-		}
 		values, err := c.ReadValues()
 		if err != nil {
 			logger.Printf("Failed to read values from %s caused by %s", c.SysId(), err.Error())
@@ -168,6 +155,7 @@ func reportValues(c client.IconClient, trigger chan int, d time.Duration, sessio
 			}
 			continue
 		}
+		session.Connected(true)
 		session.Report(values)
 		value := sleep(trigger, d)
 		if value > 0 {
