@@ -13,7 +13,6 @@ import (
 	"github.com/csutorasa/icon-metrics/pkg/model"
 )
 
-// Join path to the base URL.
 func getUrlWithPath(baseUrl *url.URL, p string) string {
 	u := new(url.URL)
 	*u = *baseUrl
@@ -48,7 +47,6 @@ func postFormRequestContextWithSession(ctx context.Context, url string, formData
 // 1 MB should be a safe hard limit.
 const maxReadBytes = 1024*1024 + 1
 
-// Unmarshal JSON content from http response body.
 func unmarshalBody(res *http.Response, v any) error {
 	err := validateStatusCode(res)
 	if err != nil {
@@ -94,7 +92,6 @@ func validateAction(res *http.Response) error {
 // session cookie name
 const phpSessionId = "PHPSESSID"
 
-// Finds session from response.
 func findSesson(res *http.Response) (*IconSession, bool) {
 	for _, cookie := range res.Cookies() {
 		if cookie.Name == phpSessionId {
@@ -106,9 +103,8 @@ func findSesson(res *http.Response) (*IconSession, bool) {
 	return nil, false
 }
 
-// Updates session from response.
 func updateSession(res *http.Response, session *IconSession) {
-	if IsAuthErrorStatusCode(res.StatusCode) {
+	if res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden {
 		session.sessionId = ""
 		return
 	}
@@ -118,7 +114,6 @@ func updateSession(res *http.Response, session *IconSession) {
 	}
 }
 
-// Adds session to request.
 func addSesson(req *http.Request, session *IconSession) error {
 	if !session.Valid() {
 		return fmt.Errorf("session is invalid")

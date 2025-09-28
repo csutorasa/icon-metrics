@@ -14,11 +14,13 @@ type IconReaderClient interface {
 	ReadValues(ctx context.Context, session *IconSession) (*model.DataPollResponse, error)
 }
 
+// HTTP client to read data from an iCON device.
 type IconReaderHttpClient struct {
 	client *http.Client
 	url    *url.URL
 }
 
+// Creates a new IconReaderClient.
 func NewIconReaderClient(c *http.Client, baseUrl *url.URL) IconReaderClient {
 	return &IconReaderHttpClient{
 		client: c,
@@ -26,7 +28,6 @@ func NewIconReaderClient(c *http.Client, baseUrl *url.URL) IconReaderClient {
 	}
 }
 
-// Reads data from the device.
 func (client *IconReaderHttpClient) ReadValues(ctx context.Context, session *IconSession) (*model.DataPollResponse, error) {
 	req, err := postFormRequestContextWithSession(ctx, getUrlWithPath(client.url, "index.php"), readValuesRequest(), session)
 	if err != nil {

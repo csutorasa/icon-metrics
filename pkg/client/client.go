@@ -12,7 +12,7 @@ import (
 	"github.com/csutorasa/icon-metrics/pkg/model"
 )
 
-// Client to read data from the iCon device.
+// Client to manage an iCon device.
 type IconClient interface {
 	io.Closer
 	// Returns the system ID.
@@ -22,29 +22,20 @@ type IconClient interface {
 	// Reads data from the device.
 	ReadValuesContext(ctx context.Context) (*model.DataPollResponse, error)
 	// Experimental!
-	// Sets the thermostat settings
+	// Sets the thermostat settings.
 	SetThermostatSettings(tab int, thermosSettings model.ThermostatSettings) error
 	// Experimental!
-	// Sets the thermostat settings
+	// Sets the thermostat settings.
 	SetThermostatSettingsContext(ctx context.Context, tab int, thermosSettings model.ThermostatSettings) error
 	// Experimental!
-	// Sets the general settings
+	// Sets the general settings.
 	SetGeneralSettings(tab int, generalSettings *model.GeneralSettings) error
 	// Experimental!
-	// Sets the general settings
+	// Sets the general settings.
 	SetGeneralSettingsContext(ctx context.Context, tab int, generalSettings *model.GeneralSettings) error
 }
 
-type iconHttpClient struct {
-	authClient   IconAuthClient
-	readerClient IconReaderClient
-	writerClient IconWriterClient
-	sysId        string
-	password     string
-	session      *IconSession
-}
-
-// Creates a new client to fetch data from an iCON device.
+// Creates a new client to manage an iCON device.
 func NewIconClient(urlStr string, sysId string, password string) (IconClient, error) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
@@ -58,7 +49,7 @@ func NewIconClient(urlStr string, sysId string, password string) (IconClient, er
 		},
 		Timeout: 10 * time.Second,
 	}
-	return &iconHttpClient{
+	return &IconHttpClient{
 		authClient:   NewAuthClient(client, u),
 		readerClient: NewIconReaderClient(client, u),
 		writerClient: NewIconWriterClient(client, u),
@@ -68,26 +59,33 @@ func NewIconClient(urlStr string, sysId string, password string) (IconClient, er
 	}, nil
 }
 
-// Returns the system ID.
-func (client *iconHttpClient) SysId() string {
+// HTTP Client to manage an iCon device.
+type IconHttpClient struct {
+	authClient   IconAuthClient
+	readerClient IconReaderClient
+	writerClient IconWriterClient
+	sysId        string
+	password     string
+	session      *IconSession
+}
+
+func (client *IconHttpClient) SysId() string {
 	return client.sysId
 }
 
 // Cleans up the client.
-func (client *iconHttpClient) Close() error {
+func (client *IconHttpClient) Close() error {
 	if client.session == nil {
 		return nil
 	}
 	return client.authClient.Logout(context.Background(), client.session)
 }
 
-// Reads data from the device.
-func (client *iconHttpClient) ReadValues() (*model.DataPollResponse, error) {
+func (client *IconHttpClient) ReadValues() (*model.DataPollResponse, error) {
 	return client.ReadValuesContext(context.Background())
 }
 
-// Reads data from the device.
-func (client *iconHttpClient) ReadValuesContext(ctx context.Context) (*model.DataPollResponse, error) {
+func (client *IconHttpClient) ReadValuesContext(ctx context.Context) (*model.DataPollResponse, error) {
 	err := client.ensureSession(ctx)
 	if err != nil {
 		return nil, err
@@ -95,11 +93,11 @@ func (client *iconHttpClient) ReadValuesContext(ctx context.Context) (*model.Dat
 	return client.readerClient.ReadValues(ctx, client.session)
 }
 
-func (client *iconHttpClient) SetThermostatSettings(tab int, thermosSettings model.ThermostatSettings) error {
+func (client *IconHttpClient) SetThermostatSettings(tab int, thermosSettings model.ThermostatSettings) error {
 	return client.SetThermostatSettingsContext(context.Background(), tab, thermosSettings)
 }
 
-func (client *iconHttpClient) SetThermostatSettingsContext(ctx context.Context, tab int, thermosSettings model.ThermostatSettings) error {
+func (client *IconHttpClient) SetThermostatSettingsContext(ctx context.Context, tab int, thermosSettings model.ThermostatSettings) error {
 	err := client.ensureSession(ctx)
 	if err != nil {
 		return err
@@ -107,11 +105,11 @@ func (client *iconHttpClient) SetThermostatSettingsContext(ctx context.Context, 
 	return client.writerClient.SetThermostatSettings(ctx, tab, thermosSettings, client.session)
 }
 
-func (client *iconHttpClient) SetGeneralSettings(tab int, generalSettings *model.GeneralSettings) error {
+func (client *IconHttpClient) SetGeneralSettings(tab int, generalSettings *model.GeneralSettings) error {
 	return client.SetGeneralSettingsContext(context.Background(), tab, generalSettings)
 }
 
-func (client *iconHttpClient) SetGeneralSettingsContext(ctx context.Context, tab int, generalSettings *model.GeneralSettings) error {
+func (client *IconHttpClient) SetGeneralSettingsContext(ctx context.Context, tab int, generalSettings *model.GeneralSettings) error {
 	err := client.ensureSession(ctx)
 	if err != nil {
 		return err
@@ -119,7 +117,7 @@ func (client *iconHttpClient) SetGeneralSettingsContext(ctx context.Context, tab
 	return client.writerClient.SetGeneralSettings(ctx, tab, generalSettings, client.session)
 }
 
-func (client *iconHttpClient) ensureSession(ctx context.Context) error {
+func (client *IconHttpClient) ensureSession(ctx context.Context) error {
 	if client.session == nil || !client.session.Valid() {
 		session, err := client.authClient.Login(ctx, client.sysId, client.password)
 		if err != nil {

@@ -7,20 +7,25 @@ import (
 	"net/url"
 )
 
+// Auth session holder
 type IconSession struct {
 	sessionId string
 }
 
+// Returns true if the session has an ID.
 func (s *IconSession) Valid() bool {
 	return s.sessionId != ""
 }
 
-// Manages session to an iCON device.
+// Manages auth to an iCON device.
 type IconAuthClient interface {
+	// Logs in with credentials and returns a session.
 	Login(ctx context.Context, sysId string, password string) (*IconSession, error)
+	// Logs out with a session.
 	Logout(ctx context.Context, session *IconSession) error
 }
 
+// Creates a new AuthClient.
 func NewAuthClient(c *http.Client, baseUrl *url.URL) IconAuthClient {
 	return &IconPhpAuthClient{
 		client: c,
