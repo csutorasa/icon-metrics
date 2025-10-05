@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/csutorasa/icon-metrics/internal/metrics/prometheus"
 )
 
 // HTTP server
@@ -18,22 +18,26 @@ type IconMetricsServer interface {
 	Start() error
 	// Stops serving and listening.
 	Stop(context context.Context) error
+	// Stops serving and listening.
+	SetStatus(status ServerStatus)
 }
 
 // HTTP server
 type iconMetricsServer struct {
-	server *http.Server
+	server         *http.Server
+	status         ServerStatus
+	metricsHandler http.Handler
 }
 
 // Creates a new server with the given port
 func NewIconMetricsServer(port int) IconMetricsServer {
-	server := &iconMetricsServer{}
+	server := &iconMetricsServer{
+		metricsHandler: prometheus.PrometheusHandler(),
+		status:         ServerStatusStarting,
+	}
 	mux := http.NewServeMux()
-	mux.Handle("GET /metrics", promhttp.Handler())
-	mux.HandleFunc("GET /status", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
-	})
+	mux.HandleFunc("GET /metrics", server.metricsHandlerFunc)
+	mux.HandleFunc("GET /status", server.statusHandlerFunc)
 	server.server = &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
 		Handler:        mux,

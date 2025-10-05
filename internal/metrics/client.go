@@ -5,19 +5,22 @@ import (
 	"errors"
 	"time"
 
+	"github.com/csutorasa/icon-metrics/internal/config"
 	"github.com/csutorasa/icon-metrics/pkg/client"
 	"github.com/csutorasa/icon-metrics/pkg/model"
 )
 
 type iconMetricsClient struct {
 	client  client.IconClient
-	session MetricsSession
+	metrics *Metrics
+	config  *config.ReportConfiguration
 }
 
-func NewIconMetricsClient(c client.IconClient, s MetricsSession) client.IconClient {
+func NewIconMetricsClient(c client.IconClient, m *Metrics, config *config.ReportConfiguration) client.IconClient {
 	return &iconMetricsClient{
 		client:  c,
-		session: s,
+		metrics: m,
+		config:  config,
 	}
 }
 
@@ -26,6 +29,7 @@ func (c *iconMetricsClient) SysId() string {
 }
 
 func (c *iconMetricsClient) Close() error {
+	c.metrics.RemoveSystem(c.client.SysId())
 	return c.client.Close()
 }
 
@@ -72,19 +76,22 @@ func (c *iconMetricsClient) SetGeneralSettingsContext(ctx context.Context, tab i
 }
 
 func (c *iconMetricsClient) httpClientRequest(endpointName string, err error, d time.Duration) {
+	if !*c.config.HttpClient {
+		return
+	}
 	if err == nil {
-		c.session.HttpClientRequest(endpointName, 200, d)
+		c.metrics.Http.Observe(c.SysId(), endpointName, 200, d)
 		return
 	}
 	errHttpStatus := &client.ErrHttpStatus{}
 	if errors.As(err, &errHttpStatus) {
-		c.session.HttpClientRequest(endpointName, errHttpStatus.StatusCode, d)
+		c.metrics.Http.Observe(c.SysId(), endpointName, errHttpStatus.StatusCode, d)
 		return
 	}
 	errHttpBodyUnmarshal := &client.ErrHttpBodyUnmarshal{}
 	if errors.As(err, &errHttpBodyUnmarshal) {
-		c.session.HttpClientRequest(endpointName, 200, d)
+		c.metrics.Http.Observe(c.SysId(), endpointName, 200, d)
 		return
 	}
-	c.session.HttpClientRequest(endpointName, 0, d)
+	c.metrics.Http.Observe(c.SysId(), endpointName, 0, d)
 }

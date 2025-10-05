@@ -36,11 +36,7 @@ type IconClient interface {
 }
 
 // Creates a new client to manage an iCON device.
-func NewIconClient(urlStr string, sysId string, password string) (IconClient, error) {
-	u, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
+func NewIconClient(url *url.URL, sysId string, password string) (IconClient, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
@@ -50,9 +46,9 @@ func NewIconClient(urlStr string, sysId string, password string) (IconClient, er
 		Timeout: 10 * time.Second,
 	}
 	return &IconHttpClient{
-		authClient:   NewAuthClient(client, u),
-		readerClient: NewIconReaderClient(client, u),
-		writerClient: NewIconWriterClient(client, u),
+		authClient:   NewAuthClient(client, url),
+		readerClient: NewIconReaderClient(client, url),
+		writerClient: NewIconWriterClient(client, url),
 		sysId:        sysId,
 		password:     password,
 		session:      nil,
