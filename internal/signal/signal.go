@@ -6,6 +6,7 @@ import (
 	"syscall"
 )
 
+// Types of interrupts
 type InterruptType int
 
 const (
@@ -14,7 +15,13 @@ const (
 	InterruptTypeForced
 )
 
+var interruptChannel <-chan InterruptType
+
+// Returns a channel that captures interrupts. It is supposed to be called only once.
 func InterruptChannel() <-chan InterruptType {
+	if interruptChannel != nil {
+		return interruptChannel
+	}
 	interrupt := make(chan os.Signal, 1)
 	output := make(chan InterruptType)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGABRT)
@@ -38,5 +45,6 @@ func InterruptChannel() <-chan InterruptType {
 			}
 		}
 	}()
+	interruptChannel = output
 	return output
 }

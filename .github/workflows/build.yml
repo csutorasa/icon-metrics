@@ -30,7 +30,7 @@ jobs:
           go-version: ${{ env.goVersion }}
 
       - name: Test
-        run: go test
+        run: go test ./...
         env:
           GOARCH: ${{ matrix.arch }}
 

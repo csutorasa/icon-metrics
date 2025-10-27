@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -17,11 +16,11 @@ func ReadConfig(r io.Reader) (*Configuration, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse yaml: %w", err)
 	}
-	err = validateConfig(config)
+	err = config.validateConfig()
 	if err != nil {
 		return config, fmt.Errorf("invalid config: %w", err)
 	}
-	setDefaults(config)
+	config.setDefaults()
 	return config, nil
 }
 
@@ -33,20 +32,4 @@ func ReadConfigFile(filepath string) (*Configuration, error) {
 	}
 	defer f.Close()
 	return ReadConfig(f)
-}
-
-// Scans the config for invalid settings.
-func validateConfig(config *Configuration) error {
-	if len(config.Devices) == 0 {
-		return errors.New("there are no devices to monitor")
-	}
-	for i, device := range config.Devices {
-		if device.SysId == "" {
-			return fmt.Errorf("device config at %d position is missing sysid", i)
-		}
-		if device.Url == "" {
-			return fmt.Errorf("device config at %d position is missing url", i)
-		}
-	}
-	return nil
 }

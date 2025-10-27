@@ -1,7 +1,7 @@
 package config
 
 // Scans the config for invalid settings.
-func setDefaults(config *Configuration) {
+func (config *Configuration) setDefaults() {
 	setDefault(&config.Port, 80)
 	for _, device := range config.Devices {
 		setDefault(&device.Password, device.SysId)

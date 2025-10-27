@@ -23,9 +23,7 @@ import (
 var logger *log.Logger = log.Default()
 
 func main() {
-	t := metrics.NewTimer()
-	args := args.ParseArgs()
-	logger.Printf("Arguments - loaded in %s %s", t.End(), args)
+	args := readArguments()
 	c := readConfigFile(args.Config)
 	m := prometheus.RegisterMetrics()
 	s := startServer(c.Port)
@@ -48,6 +46,17 @@ func main() {
 	wg.Wait()
 }
 
+// Returns the arguments.
+func readArguments() *args.Args {
+	t := metrics.NewTimer()
+	args, err := args.ParseArgs(os.Args[1:])
+	if err != nil {
+		logger.Panicf("Arguments - %s", err.Error())
+	}
+	logger.Printf("Arguments - loaded in %s %s", t.End(), args)
+	return args
+}
+
 // Returns configuration from file.
 func readConfigFile(configPath string) *config.Configuration {
 	t := metrics.NewTimer()
@@ -60,6 +69,7 @@ func readConfigFile(configPath string) *config.Configuration {
 	return c
 }
 
+// Starts the HTTP server.
 func startServer(port int) server.IconMetricsServer {
 	t := metrics.NewTimer()
 	logger.Printf("Server - starting on port %d", port)
@@ -72,6 +82,7 @@ func startServer(port int) server.IconMetricsServer {
 	return s
 }
 
+// Closes the HTTP server.
 func closeServer(s server.IconMetricsServer) {
 	t := metrics.NewTimer()
 	logger.Printf("Server - stopping")
@@ -100,6 +111,7 @@ func interruptHandler(s server.IconMetricsServer, cancelFuncs []context.CancelFu
 	}()
 }
 
+// Creates clients from the configuration. Skips devices which fail to initialize.
 func createClients(devices []*config.IconConfiguration, m *metrics.Metrics) map[client.IconClient]*config.IconConfiguration {
 	clients := map[client.IconClient]*config.IconConfiguration{}
 	for _, device := range devices {
@@ -113,18 +125,17 @@ func createClients(devices []*config.IconConfiguration, m *metrics.Metrics) map[
 	return clients
 }
 
+// Creates a client from the configuration.
 func newIconClient(device *config.IconConfiguration, m *metrics.Metrics) (client.IconClient, error) {
 	u, err := url.Parse(device.Url)
 	if err != nil {
 		return nil, err
 	}
-	c, err := client.NewIconClient(u, device.SysId, device.Password)
-	if err != nil {
-		return nil, err
-	}
+	c := client.NewIconClient(u, device.SysId, device.Password)
 	return metrics.NewIconMetricsClient(c, m, device.Report), nil
 }
 
+// Closes a client.
 func closeIconClient(client client.IconClient) {
 	t := metrics.NewTimer()
 	logger.Printf("Client %s - disonnecting", client.SysId())
@@ -136,6 +147,7 @@ func closeIconClient(client client.IconClient) {
 	}
 }
 
+// Starts a loop that reads value from the client and reports it.
 func reportValuesLoop(client client.IconClient, device *config.IconConfiguration, m *metrics.Metrics, wg *sync.WaitGroup) context.CancelFunc {
 	delay := time.Duration(device.Delay) * time.Second
 	ctx, cancel := context.WithCancel(context.Background())

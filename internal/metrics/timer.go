@@ -6,6 +6,7 @@ import "time"
 type Timer interface {
 	// Returns the duration since start.
 	End() time.Duration
+	// Restarts the timer.
 	Reset()
 }
 
@@ -29,6 +30,7 @@ func (timer *timerImpl) End() time.Duration {
 	return time.Since(timer.startTime)
 }
 
+// Measures f runtime.
 func Timed(f func()) time.Duration {
 	t := NewTimer()
 	f()

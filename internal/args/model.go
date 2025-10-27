@@ -1,6 +1,8 @@
 package args
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Command line arguments
 type Args struct {

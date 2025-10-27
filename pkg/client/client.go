@@ -36,7 +36,7 @@ type IconClient interface {
 }
 
 // Creates a new client to manage an iCON device.
-func NewIconClient(url *url.URL, sysId string, password string) (IconClient, error) {
+func NewIconClient(url *url.URL, sysId string, password string) IconClient {
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
@@ -52,7 +52,7 @@ func NewIconClient(url *url.URL, sysId string, password string) (IconClient, err
 		sysId:        sysId,
 		password:     password,
 		session:      nil,
-	}, nil
+	}
 }
 
 // HTTP Client to manage an iCon device.

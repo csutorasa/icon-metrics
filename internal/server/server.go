@@ -22,14 +22,13 @@ type IconMetricsServer interface {
 	SetStatus(status ServerStatus)
 }
 
-// HTTP server
 type iconMetricsServer struct {
 	server         *http.Server
 	status         ServerStatus
 	metricsHandler http.Handler
 }
 
-// Creates a new server with the given port
+// Creates a new server with the given port.
 func NewIconMetricsServer(port int) IconMetricsServer {
 	server := &iconMetricsServer{
 		metricsHandler: prometheus.PrometheusHandler(),
@@ -48,7 +47,6 @@ func NewIconMetricsServer(port int) IconMetricsServer {
 	return server
 }
 
-// Starts to listen and serve.
 func (publisher *iconMetricsServer) Start() error {
 	ln, err := net.Listen("tcp", publisher.server.Addr)
 	if err != nil {
@@ -60,12 +58,10 @@ func (publisher *iconMetricsServer) Start() error {
 	return nil
 }
 
-// Stops serving and listening.
 func (publisher *iconMetricsServer) Stop(context context.Context) error {
 	return publisher.server.Shutdown(context)
 }
 
-// Cleans up resources.
 func (publisher *iconMetricsServer) Close() error {
 	return publisher.server.Close()
 }

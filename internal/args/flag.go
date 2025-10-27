@@ -2,22 +2,20 @@ package args
 
 import (
 	"flag"
-	"os"
-	"path/filepath"
+	"fmt"
 )
 
 // Parses args from command line options with flag
-func ParseArgs() *Args {
+func ParseArgs(arguments []string) (*Args, error) {
 	configPath := flag.String("config", "", "Configuration file url")
-	flag.Parse()
-	var config string
-	if *configPath == "" {
-		dir := filepath.Dir(os.Args[0])
-		config = filepath.Join(dir, "config.yml")
-	} else {
-		config = *configPath
+	flag.CommandLine.Parse(arguments)
+	args := &Args{
+		Config: *configPath,
 	}
-	return &Args{
-		Config: config,
+	args.setDefaults()
+	err := args.validateConfig()
+	if err != nil {
+		return args, fmt.Errorf("invalid args: %w", err)
 	}
+	return args, nil
 }

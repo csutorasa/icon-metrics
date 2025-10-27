@@ -2,6 +2,7 @@ package server
 
 import "net/http"
 
+// HTTP server status
 type ServerStatus string
 
 const (
@@ -10,6 +11,7 @@ const (
 	ServerStatusStopping ServerStatus = "stopping"
 )
 
+// Sets the status of the server.
 func (s *iconMetricsServer) SetStatus(status ServerStatus) {
 	s.status = status
 }
