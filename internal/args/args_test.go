@@ -1,7 +1,6 @@
 package args_test
 
 import (
-	"flag"
 	"os"
 	"testing"
 
@@ -10,8 +9,8 @@ import (
 
 func TestParseArgs(t *testing.T) {
 	currentFile := os.Args[0]
-	flag.CommandLine = flag.NewFlagSet(currentFile, flag.ExitOnError)
-	args, err := args.ParseArgs([]string{
+	args, err := args.Parse([]string{
+		currentFile,
 		"-config", currentFile,
 	})
 	if err != nil {
@@ -24,8 +23,8 @@ func TestParseArgs(t *testing.T) {
 }
 
 func TestParseInvalidArgs(t *testing.T) {
-	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	_, err := args.ParseArgs([]string{
+	_, err := args.Parse([]string{
+		os.Args[0],
 		"-config", "file-that-does-not-exist.yml",
 	})
 	if err == nil {

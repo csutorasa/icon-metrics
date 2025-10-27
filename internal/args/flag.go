@@ -3,12 +3,19 @@ package args
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
-// Parses args from command line options with flag
-func ParseArgs(arguments []string) (*Args, error) {
-	configPath := flag.String("config", "", "Configuration file url")
-	flag.CommandLine.Parse(arguments)
+// Parses args from [os.Args] with [flag].
+func ParseArgs() (*Args, error) {
+	return Parse(os.Args)
+}
+
+// Parses args with [flag].
+func Parse(arguments []string) (*Args, error) {
+	flagSet := flag.NewFlagSet(arguments[0], flag.ContinueOnError)
+	configPath := flagSet.String("config", "", "Configuration file url")
+	flagSet.Parse(arguments[1:])
 	args := &Args{
 		Config: *configPath,
 	}

@@ -49,7 +49,7 @@ func main() {
 // Returns the arguments.
 func readArguments() *args.Args {
 	t := metrics.NewTimer()
-	args, err := args.ParseArgs(os.Args[1:])
+	args, err := args.ParseArgs()
 	if err != nil {
 		logger.Panicf("Arguments - %s", err.Error())
 	}
