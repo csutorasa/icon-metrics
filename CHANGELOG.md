@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.4
+
+Bump go version to 1.25.
+Bump dependency versions.
+
 ## 1.3.3
 
 Bump go version to 1.24.
