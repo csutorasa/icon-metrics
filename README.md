@@ -35,13 +35,14 @@ For further configuration options use the [schema](config.schema.json) to explor
 
 ## Docker image
 
-Create your config.yml and run the command below
+Create your `config.yml` and run the command below
 
 ```bash
 docker run -d -v /path/to/your/config.yml:/app/config.yml -p8080:8080 csutorasa/icon-metrics:latest
 ```
 
-If you do not want use 8080 port then use `-p${YOUR_PORT}:8080`.
+If you do not want use 8080 port then use `-p${YOUR_PORT}:8080`,
+but keep using 8080 port in the config.
 
 ## Metrics
 

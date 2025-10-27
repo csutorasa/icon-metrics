@@ -17,7 +17,7 @@ const (
 
 var interruptChannel <-chan InterruptType
 
-// Returns a channel that captures interrupts. It is supposed to be called only once.
+// Returns a channel that captures interrupts.
 func InterruptChannel() <-chan InterruptType {
 	if interruptChannel != nil {
 		return interruptChannel
